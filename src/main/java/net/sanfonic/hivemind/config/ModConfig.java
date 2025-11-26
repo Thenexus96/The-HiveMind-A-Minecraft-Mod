@@ -4,16 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 
-import java.io.*;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ModConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final  String CONFIG_FILE_NAME = "hivemind.json";
+    private static final String CONFIG_FILE_NAME = "hivemind.json";
     private static ModConfig INSTANCE;
 
-    // Config Options
+    // Existing Config Options
     public boolean enableDebugLogging = false;
     public boolean enableDroneLinkingDebug = false;
     public boolean enableCommandDebug = false;
@@ -21,6 +22,15 @@ public class ModConfig {
     public double droneFollowRange = 16.0;
     public double droneHealth = 40.0;
     public double droneSpeed = 0.25;
+
+    // NEW: Debug Mode Options
+    public boolean debugModeEnabled = false;
+    public boolean debugShowOverlay = true;
+    public boolean debugInstantSpawn = true;
+    public boolean debugBypassAccess = true;
+    public boolean debugUnlimitedDrones = true;
+    public boolean debugAutoLink = true;
+    public int debugSpawnRadius = 5; // How far from player to spawn drones
 
     // Transient fields (not saved to config)
     private transient Path configPath;
@@ -51,6 +61,15 @@ public class ModConfig {
                         this.droneFollowRange = loaded.droneFollowRange;
                         this.droneHealth = loaded.droneHealth;
                         this.droneSpeed = loaded.droneSpeed;
+
+                        // NEW: Load debug settings
+                        this.debugModeEnabled = loaded.debugModeEnabled;
+                        this.debugShowOverlay = loaded.debugShowOverlay;
+                        this.debugInstantSpawn = loaded.debugInstantSpawn;
+                        this.debugBypassAccess = loaded.debugBypassAccess;
+                        this.debugUnlimitedDrones = loaded.debugUnlimitedDrones;
+                        this.debugAutoLink = loaded.debugAutoLink;
+                        this.debugSpawnRadius = loaded.debugSpawnRadius;
                     }
                 }
                 System.out.println("[HiveMind] Config loaded from " + configPath);
@@ -67,7 +86,6 @@ public class ModConfig {
 
     public void save() {
         try {
-            // Create config directory if it doesn't exist
             Files.createDirectories(configPath.getParent());
             try (Writer writer = Files.newBufferedWriter(configPath)) {
                 GSON.toJson(this, writer);
@@ -79,7 +97,7 @@ public class ModConfig {
         }
     }
 
-    // Convience methods for debug logging
+    // Existing convenience methods
     public void debugLog(String message) {
         if (enableDebugLogging) {
             System.out.println("[HiveMind DEBUG] " + message);
@@ -98,7 +116,14 @@ public class ModConfig {
         }
     }
 
-    // Getters for convenience
+    // NEW: Debug-specific logging
+    public void debugModeLog(String message) {
+        if (debugModeEnabled && enableDebugLogging) {
+            System.out.println("[HiveMind DEBUG MODE] " + message);
+        }
+    }
+
+    // Getters
     public long getLogCooldownMillis() {
         return logCooldownSeconds * 1000L;
     }
@@ -113,5 +138,30 @@ public class ModConfig {
 
     public boolean isCommandDebugEnabled() {
         return enableCommandDebug;
+    }
+
+    // NEW: Debug mode getters
+    public boolean isDebugModeEnabled() {
+        return debugModeEnabled;
+    }
+
+    public boolean shouldShowDebugOverlay() {
+        return debugModeEnabled && debugShowOverlay;
+    }
+
+    public boolean canInstantSpawn() {
+        return debugModeEnabled && debugInstantSpawn;
+    }
+
+    public boolean canBypassAccess() {
+        return debugModeEnabled && debugBypassAccess;
+    }
+
+    public boolean hasUnlimitedDrones() {
+        return debugModeEnabled && debugUnlimitedDrones;
+    }
+
+    public boolean shouldAutoLink() {
+        return debugModeEnabled && debugAutoLink;
     }
 }

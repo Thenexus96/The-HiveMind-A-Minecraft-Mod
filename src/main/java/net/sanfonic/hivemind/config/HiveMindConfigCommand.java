@@ -1,21 +1,19 @@
 package net.sanfonic.hivemind.config;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
-import net.sanfonic.hivemind.config.ModConfig;
-
 public class HiveMindConfigCommand {
     public static void register() {
-        CommandRegistrationCallback.EVENT.register(((commandDispatcher, commandRegistryAccess, registrationEnvironment) -> {
+        CommandRegistrationCallback.EVENT.register(((
+                commandDispatcher,
+                commandRegistryAccess, registrationEnvironment) -> {
             commandDispatcher.register(
                     CommandManager.literal("hivemind_config")
                             .requires(source -> source.hasPermissionLevel(2))
@@ -38,11 +36,15 @@ public class HiveMindConfigCommand {
                                     .then(CommandManager.argument("seconds", IntegerArgumentType.integer(1, 60))
                                             .executes(HiveMindConfigCommand::setLogCooldown)))
                             .then(CommandManager.literal("drone_health")
-                                    .then(CommandManager.argument("health", DoubleArgumentType.doubleArg(1.0, 100.0))
+                                    .then(CommandManager.argument("health",
+                                                    DoubleArgumentType.doubleArg(1.0, 100.0))
                                             .executes(HiveMindConfigCommand::setDroneHealth)))
                             .then(CommandManager.literal("drone_speed")
                                     .then(CommandManager.argument("speed", DoubleArgumentType.doubleArg(0.1, 2.0))
                                             .executes(HiveMindConfigCommand::setDroneSpeed)))
+                            .then(CommandManager.literal("debug_mode")
+                                    .then(CommandManager.argument("enabled", BoolArgumentType.bool())
+                                            .executes(HiveMindConfigCommand::setDebugMode)))
             );
         }));
     }
@@ -63,13 +65,22 @@ public class HiveMindConfigCommand {
         ModConfig config = ModConfig.getInstance();
 
         context.getSource().sendFeedback(() -> Text.literal("§6=== HiveMind Config ==="), false);
-        context.getSource().sendFeedback(() -> Text.literal("§7Debug Logging: §" + (config.enableDebugLogging ? "a" : "c") + config.enableDebugLogging), false);
-        context.getSource().sendFeedback(() -> Text.literal("§7Drone Link Debug: §" + (config.enableDroneLinkingDebug ? "a" : "c") + config.enableDroneLinkingDebug), false);
-        context.getSource().sendFeedback(() -> Text.literal("§7Command Debug: §" + (config.enableCommandDebug ? "a" : "c") + config.enableCommandDebug), false);
-        context.getSource().sendFeedback(() -> Text.literal("§7Log Cooldown: §b" + config.logCooldownSeconds + "s"), false);
-        context.getSource().sendFeedback(() -> Text.literal("§7Drone Health: §b" + config.droneHealth), false);
-        context.getSource().sendFeedback(() -> Text.literal("§7Drone Speed: §b" + config.droneSpeed), false);
-        context.getSource().sendFeedback(() -> Text.literal("§7Drone Follow Range: §b" + config.droneFollowRange), false);
+        context.getSource().sendFeedback(() -> Text.literal("§7Debug Logging: §" +
+                (config.enableDebugLogging ? "a" : "c") + config.enableDebugLogging), false);
+        context.getSource().sendFeedback(() -> Text.literal("§7Drone Link Debug: §" +
+                (config.enableDroneLinkingDebug ? "a" : "c") + config.enableDroneLinkingDebug), false);
+        context.getSource().sendFeedback(() -> Text.literal("§7Command Debug: §" +
+                (config.enableCommandDebug ? "a" : "c") + config.enableCommandDebug), false);
+        context.getSource().sendFeedback(() -> Text.literal("§7Log Cooldown: §b" +
+                config.logCooldownSeconds + "s"), false);
+        context.getSource().sendFeedback(() -> Text.literal("§7Drone Health: §b" +
+                config.droneHealth), false);
+        context.getSource().sendFeedback(() -> Text.literal("§7Drone Speed: §b" +
+                config.droneSpeed), false);
+        context.getSource().sendFeedback(() -> Text.literal("§7Drone Follow Range: §b" +
+                config.droneFollowRange), false);
+        context.getSource().sendFeedback(() -> Text.literal("§7Debug Mode: §" +
+                (config.debugModeEnabled ? "a" : "c") + config.debugModeEnabled), false);
 
         return 1;
     }
@@ -79,7 +90,8 @@ public class HiveMindConfigCommand {
         ModConfig.getInstance().enableDebugLogging = enabled;
         ModConfig.getInstance().save();
 
-        context.getSource().sendFeedback(() -> Text.literal("§aDebug logging " + (enabled ? "enabled" : "disabled")), false);
+        context.getSource().sendFeedback(() -> Text.literal("§aDebug logging " +
+                (enabled ? "enabled" : "disabled")), false);
         return 1;
     }
 
@@ -88,7 +100,8 @@ public class HiveMindConfigCommand {
         ModConfig.getInstance().enableDroneLinkingDebug = enabled;
         ModConfig.getInstance().save();
 
-        context.getSource().sendFeedback(() -> Text.literal("§aDrone linking debug " + (enabled ? "enabled" : "disabled")), false);
+        context.getSource().sendFeedback(() -> Text.literal("§aDrone linking debug " +
+                (enabled ? "enabled" : "disabled")), false);
         return 1;
     }
 
@@ -97,7 +110,8 @@ public class HiveMindConfigCommand {
         ModConfig.getInstance().enableCommandDebug = enabled;
         ModConfig.getInstance().save();
 
-        context.getSource().sendFeedback(() -> Text.literal("§aCommand debug " + (enabled ? "enabled" : "disabled")), false);
+        context.getSource().sendFeedback(() -> Text.literal("§aCommand debug " +
+                (enabled ? "enabled" : "disabled")), false);
         return 1;
     }
 
@@ -106,7 +120,8 @@ public class HiveMindConfigCommand {
         ModConfig.getInstance().logCooldownSeconds = seconds;
         ModConfig.getInstance().save();
 
-        context.getSource().sendFeedback(() -> Text.literal("§aLog cooldown set to " + seconds + " seconds"), false);
+        context.getSource().sendFeedback(() -> Text.literal("§aLog cooldown set to " + seconds + " seconds"),
+                false);
         return 1;
     }
 
@@ -115,7 +130,8 @@ public class HiveMindConfigCommand {
         ModConfig.getInstance().droneHealth = health;
         ModConfig.getInstance().save();
 
-        context.getSource().sendFeedback(() -> Text.literal("§aDrone health set to " + health + " (requires restart for existing drones)"), false);
+        context.getSource().sendFeedback(() -> Text.literal("§aDrone health set to " + health +
+                " (requires restart for existing drones)"), false);
         return 1;
     }
 
@@ -124,7 +140,17 @@ public class HiveMindConfigCommand {
         ModConfig.getInstance().droneSpeed = speed;
         ModConfig.getInstance().save();
 
-        context.getSource().sendFeedback(() -> Text.literal("§aDrone speed set to " + speed + " (requires restart for existing drones)"), false);
+        context.getSource().sendFeedback(() -> Text.literal("§aDrone speed set to " + speed +
+                " (requires restart for existing drones)"), false);
+        return 1;
+    }
+
+    private static int setDebugMode(CommandContext<ServerCommandSource> context) {
+        boolean enabled = BoolArgumentType.getBool(context, "enabled");
+        ModConfig.getInstance().debugModeEnabled = enabled;
+        ModConfig.getInstance().save();
+        context.getSource().sendFeedback(() -> Text.literal("§aDebug mode " + (enabled ? "enabled" : "disabled")),
+                false);
         return 1;
     }
 }
