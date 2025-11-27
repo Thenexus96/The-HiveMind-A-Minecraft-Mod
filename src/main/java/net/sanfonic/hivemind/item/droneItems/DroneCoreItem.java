@@ -34,19 +34,17 @@ public class DroneCoreItem extends Item {
             return ActionResult.FAIL;
         }
 
-        // Check if player has HiveMind access
-        if (!PlayerHiveComponent.hasAccess(player)) {
-            if (!world.isClient) {
+        if (!world.isClient) {
+            // Check access only on server
+            if (!PlayerHiveComponent.hasAccess(player)) {
                 player.sendMessage(
                         Text.literal("⚠ ").formatted(Formatting.RED)
                                 .append(Text.literal("You need HiveMind access to deploy drones!").formatted(Formatting.GRAY)),
                         false
                 );
+                return ActionResult.FAIL;
             }
-            return ActionResult.FAIL;
-        }
 
-        if (!world.isClient) {
             ServerWorld serverWorld = (ServerWorld) world;
 
             // Get the position to spawn the drone (above the clicked block)
