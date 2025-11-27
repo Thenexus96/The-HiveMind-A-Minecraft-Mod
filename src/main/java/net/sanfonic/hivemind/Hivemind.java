@@ -3,16 +3,14 @@ package net.sanfonic.hivemind;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.Registries;
-import net.minecraft.item.Item;
-
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
 import net.sanfonic.hivemind.block.ModBlock;
-import net.sanfonic.hivemind.client.DroneClientHandler;
+import net.sanfonic.hivemind.client.debug.DebugNetworkHandler;
 import net.sanfonic.hivemind.commands.DroneControlCommands;
 import net.sanfonic.hivemind.commands.HiveMindCommands;
 import net.sanfonic.hivemind.data.HiveMindData.HiveMindServerEvents;
@@ -21,7 +19,6 @@ import net.sanfonic.hivemind.entity.DroneEntity;
 import net.sanfonic.hivemind.entity.ModEntities;
 import net.sanfonic.hivemind.item.ModItemGroups;
 import net.sanfonic.hivemind.item.ModItems;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +48,7 @@ public class Hivemind implements ModInitializer {
 		DroneControlCommands.init();
 		HiveMindServerEvents.register();
         PlayerDataEvents.register();
+        DebugNetworkHandler.register();
 
 		//Register attributes AFTER entities are registered
 		FabricDefaultAttributeRegistry.register(ModEntities.DRONE, DroneEntity.createMobAttributes());
