@@ -12,21 +12,20 @@ import net.minecraft.world.World;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Manages HiveCode assignment for drones
- * HiveCodes are short, readable identifiers like "D-001", "D-042"
- * Format: D-XXX where XXX is a zero-padded number
+ * Manages HiveCode assignment for drones with PER-PLAYER counters
+ * Each player has their own drone numbering D-001, D-002, D-003, etc.
+ * Numbers are never reused - if D-002 dies, the next drone is D-004
  */
 public class HiveCodeManager extends PersistentState {
     private static final String DATA_NAME = "hivemind_hivecodes";
     private static final String HIVECODE_PREFIX = "D-";
 
-    // Counter for next available drone number
-    private final AtomicInteger nextDroneNumber = new AtomicInteger(1);
+    // Per-player counter: ownerUUID -> next available drone number
+    private final Map<UUID, Integer> playerNextDroneNumber = new HashMap<>();
 
-    // Maps: droneUUID <-> HiveCode
+    // Maps: droneUUID <-> HiveCode (permanent assignments)
     private final Map<UUID, String> droneToCode = new HashMap<>();
     private final Map<String, UUID> codeToDrone = new HashMap<>();
 
@@ -53,9 +52,16 @@ public class HiveCodeManager extends PersistentState {
     public static HiveCodeManager createFromNbt(NbtCompound nbt) {
         HiveCodeManager manager = new HiveCodeManager();
 
-        // Load next drone number
-        if (nbt.contains("NextDroneNumber")) {
-            manager.nextDroneNumber.set(nbt.getInt("NextDroneNumber"));
+        // Load per-player counters
+        NbtCompound countersNbt = nbt.getCompound("PlayerCounters");
+        for (String key : countersNbt.getKeys()) {
+            try {
+                UUID ownerUUID = UUID.fromString(key);
+                int nextNumber = countersNbt.getInt(key);
+                manager.playerNextDroneNumber.put(ownerUUID, nextNumber);
+            } catch (IllegalArgumentException e) {
+                System.err.println("[HiveMind] Invalid UUID in PlayerCounters: " + key);
+            }
         }
 
         // Load drone code mappings
@@ -104,8 +110,13 @@ public class HiveCodeManager extends PersistentState {
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
-        // Save next drone number
-        nbt.putInt("NextDroneNumber", nextDroneNumber.get());
+        // Save per-player counters
+        NbtCompound countersNbt = new NbtCompound();
+        for (Map.Entry<UUID, Integer> entry : playerNextDroneNumber.entrySet()) {
+            countersNbt.putInt(entry.getKey().toString(), entry.getValue());
+        }
+        nbt.put("PlayerCounters", countersNbt);
+
         // Save drone code mappings
         NbtList mappingsList = new NbtList();
         for (Map.Entry<UUID, String> entry : droneToCode.entrySet()) {
@@ -124,24 +135,29 @@ public class HiveCodeManager extends PersistentState {
 
     /**
      * Generate a new HiveCode for a drone
-     *
+     * Uses the player's personal counter
      * @param droneUUID The Drone's UUID
      * @param ownerUUID The Owner's UUID
-     * @return The generated HiveCode (e.g., "D-01")
+     * @return The generated HiveCode (e.g., "D-001")
      */
     public String generateHiveCode(UUID droneUUID, UUID ownerUUID) {
         // Check if drone already has a code
         if (droneToCode.containsKey(droneUUID)) {
             return droneToCode.get(droneUUID);
         }
-
         // Generate new code
-        int droneNumber = nextDroneNumber.getAndIncrement();
+        int droneNumber = playerNextDroneNumber.getOrDefault(ownerUUID, 1);
+        //Increment counter for next drone
+        playerNextDroneNumber.put(ownerUUID, droneNumber + 1);
+        // Generate code
         String hiveCode = HIVECODE_PREFIX + String.format("%03d", droneNumber);
         // Store Mappings
         droneToCode.put(droneUUID, hiveCode);
         codeToDrone.put(hiveCode, droneUUID);
         codeToOwner.put(hiveCode, ownerUUID);
+
+        System.out.println("[HiveMind] Generated HiveCode " + hiveCode + " for player " +
+                ownerUUID.toString().substring(0, 8) + " (player's drone #" + droneNumber + ")");
 
         markDirty();
         return hiveCode;
@@ -158,17 +174,24 @@ public class HiveCodeManager extends PersistentState {
     }
 
     /**
-     * Get the drone UUID from a HiveCode
-     *
-     * @param hiveCode The HiveCode (e.g., "D-001")
-     * @return The drone's UUID or null if not assigned
+     * Get the drone from UUID from a HiveCode
+     * Note: Multiple players can have D-001, so you need to filter by owner
+     * @param hiveCode The HiveCode (e.g., "D-001)
+     * @return The drone's UUID, or null if not found
      */
-    public UUID getDroneFromCode(String hiveCode) {
-        return codeToDrone.get(hiveCode);
+    public UUID getDroneFromCode(String hiveCode, UUID ownerUUID) {
+        UUID droneUUID = codeToDrone.get(hiveCode);
+        if (droneUUID != null) {
+            UUID codeOwner = codeToOwner.get(hiveCode);
+            if (ownerUUID.equals(codeOwner)) {
+                return droneUUID;
+            }
+        }
+        return null;
     }
 
     /**
-     * Get the owner of a dron by HiveCode
+     * Get the owner of a drone by HiveCode
      *
      * @param hiveCode The HiveCode
      * @return The owner's UUID, or null if not assigned
@@ -178,18 +201,19 @@ public class HiveCodeManager extends PersistentState {
     }
 
     /**
-     * Check if a HiveCode is already in use
-     *
+     * Check if a HiveCode is already in use by this player
      * @param hiveCode The code to check
-     * @return true if the code exists
+     * @param ownerUUID The player's UUID
+     * @return true if the code exists for this player
      */
-    public boolean isCodeInUse(String hiveCode) {
-        return codeToDrone.containsKey(hiveCode);
+    public boolean isCodeInUseByPlayer(String hiveCode, UUID ownerUUID) {
+        UUID codeOwner = codeToOwner.get(hiveCode);
+        return codeOwner != null && codeOwner.equals(hiveCode);
     }
 
     /**
      * Remove a drone's HiveCode (called when drone dies or is removed)
-     *
+     * Note: The player's counter is NOT decremented - numbers are never reused
      * @param droneUUID The drone's UUID
      */
     public void removeHiveCode(UUID droneUUID) {
@@ -197,6 +221,7 @@ public class HiveCodeManager extends PersistentState {
         if (hiveCode != null) {
             codeToDrone.remove(hiveCode);
             codeToOwner.remove(hiveCode);
+            System.out.println("[HiveMind] Removed HiveCode " + hiveCode + " (number not reused)");
             markDirty();
         }
     }
@@ -205,7 +230,7 @@ public class HiveCodeManager extends PersistentState {
      * Get all HiveCodes owned by a player
      *
      * @param ownerUUID The owner's UUID
-     * @return Map of HiveCode -> DroneUUID
+     * @return Map of HiveCode -> DroneUUID for this player
      */
     public Map<String, UUID> getOwnerDroneCodes(UUID ownerUUID) {
         Map<String, UUID> result = new HashMap<>();
@@ -216,6 +241,16 @@ public class HiveCodeManager extends PersistentState {
             }
         }
         return result;
+    }
+
+    /**
+     * Get the next drone number for a player (fir display purposes
+     *
+     * @param ownerUUID The player's UUID
+     * @return The next drone number that will be assigned
+     */
+    public int getPlayerNextDroneNumber(UUID ownerUUID) {
+        return playerNextDroneNumber.getOrDefault(ownerUUID, 1);
     }
 
     /**
