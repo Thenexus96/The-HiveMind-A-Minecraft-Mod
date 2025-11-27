@@ -4,7 +4,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleTypes;
@@ -30,12 +29,6 @@ import java.util.UUID;
 public class DebugCommands {
 
     public static void init() {
-        CommandRegistrationCallback.EVENT.register(((
-                dispatcher,
-                registryAccess,
-                environment) -> {
-            registerCommands(dispatcher);
-        }));
     }
 
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -72,6 +65,24 @@ public class DebugCommands {
                         // Show debug status
                         .then(CommandManager.literal("status")
                                 .executes(DebugCommands::showDebugStatus))
+                        // Teleport commands
+                        .then(CommandManager.literal("teleport")
+                                .then(CommandManager.literal("tome")
+                                        .then(CommandManager.argument("drone", EntityArgumentType.entity())
+                                                .executes(DebugCommands::teleportDroneToPlayer)))
+                                .then(CommandManager.literal("todrone")
+                                        .then(CommandManager.argument("drone", EntityArgumentType.entity())
+                                                .executes(DebugCommands::teleportPlayerToDrone)))
+                                .then(CommandManager.literal("nearest")
+                                        .executes(DebugCommands::teleportNearestDrone)))
+                        // Heal drone
+                        .then(CommandManager.literal("heal")
+                                .then(CommandManager.argument("drone", EntityArgumentType.entity())
+                                        .executes(DebugCommands::healDrone)))
+                        // Damage drone
+                        .then(CommandManager.literal("damage")
+                                .then(CommandManager.argument("drone", EntityArgumentType.entity())
+                                        .executes(DebugCommands::damageDrone)))
         );
     }
 
@@ -360,5 +371,200 @@ public class DebugCommands {
                             .formatted(Formatting.GRAY), false);
         }
         return 1;
+    }
+
+    private static int teleportDroneToPlayer(CommandContext<ServerCommandSource> context) {
+        try {
+            ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+            Entity entity = EntityArgumentType.getEntity(context, "drone");
+
+            if (!(entity instanceof DroneEntity drone)) {
+                context.getSource().sendError(Text.literal("Target is not a drone!"));
+                return 0;
+            }
+
+            ServerWorld world = player.getServerWorld();
+            // Get position in from of player
+            Vec3d lookVec = player.getRotationVector().multiply(3.0);
+            Vec3d teleportPos = player.getPos().add(lookVec);
+            // Spawn particles at old position
+            world.spawnParticles(
+                    ParticleTypes.PORTAL,
+                    drone.getX(), drone.getY() + 1, drone.getZ(),
+                    30, 0.5, 0.5, 0.5, 0.5
+            );
+
+            // Teleport
+            drone.teleport(teleportPos.x, teleportPos.y, teleportPos.z);
+            // Spawn particles at new position
+            world.spawnParticles(
+                    ParticleTypes.PORTAL,
+                    teleportPos.x, teleportPos.y + 1, teleportPos.z,
+                    30, 0.5, 0.5, 0.5, 0.5
+            );
+            // Play sound
+            world.playSound(null, drone.getBlockPos(),
+                    SoundEvents.ENTITY_ENDERMAN_TELEPORT,
+                    SoundCategory.NEUTRAL, 1.0F, 1.0F);
+            String hiveCode = drone.getHiveCode();
+            context.getSource().sendFeedback(() ->
+                            Text.literal("§bTeleported drone ").formatted(Formatting.AQUA)
+                                    .append(Text.literal(hiveCode).formatted(Formatting.GOLD))
+                                    .append(Text.literal(" to you").formatted(Formatting.AQUA)),
+                    false);
+            return 1;
+        } catch (Exception e) {
+            context.getSource().sendError(Text.literal("Error: " + e.getMessage()));
+            return 0;
+        }
+    }
+
+    private static int teleportPlayerToDrone(CommandContext<ServerCommandSource> context) {
+        try {
+            ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+            Entity entity = EntityArgumentType.getEntity(context, "drone");
+
+            if (!(entity instanceof DroneEntity drone)) {
+                context.getSource().sendError(Text.literal("Target is not a drone!"));
+                return 0;
+            }
+            ServerWorld world = player.getServerWorld();
+            Vec3d dronePos = drone.getPos();
+            // Spawn particles at new position
+            world.spawnParticles(
+                    ParticleTypes.PORTAL,
+                    dronePos.x, dronePos.y + 1, dronePos.z,
+                    30, 0.5, 0.5, 0.5, 0.5
+            );
+            // Play sound
+            world.playSound(null, player.getBlockPos(),
+                    SoundEvents.ENTITY_ENDERMAN_TELEPORT,
+                    SoundCategory.PLAYERS, 1.0F, 1.0F);
+            String hiveCode = drone.getHiveCode();
+            context.getSource().sendFeedback(() ->
+                            Text.literal("§bTeleported to drone ").formatted(Formatting.AQUA)
+                                    .append(Text.literal(hiveCode).formatted(Formatting.GOLD)),
+                    false);
+
+            return 1;
+        } catch (Exception e) {
+            context.getSource().sendError(Text.literal("Error: " + e.getMessage()));
+            return 0;
+        }
+    }
+
+    private static int teleportNearestDrone(CommandContext<ServerCommandSource> context) {
+        try {
+            ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+            ServerWorld world = player.getServerWorld();
+            // Find nearest drone
+            DroneEntity nearestDrone = world.getEntitiesByClass(
+                            DroneEntity.class,
+                            player.getBoundingBox().expand(100),
+                            drone -> true
+                    ).stream()
+                    .min((d1, d2) ->
+                            Double.compare(player.distanceTo(d1), player.distanceTo(d2)))
+                    .orElse(null);
+            if (nearestDrone == null) {
+                context.getSource().sendError(Text.literal("No drones found nearby!"));
+                return 0;
+            }
+            // Get position in front of player
+            Vec3d lookVec = player.getRotationVector().multiply(3.0);
+            Vec3d teleportPos = player.getPos().add(lookVec);
+            // Spawn particles at old position
+            world.spawnParticles(
+                    ParticleTypes.PORTAL,
+                    nearestDrone.getX(), nearestDrone.getY() + 1, nearestDrone.getZ(),
+                    30, 0.5, 0.5, 0.5, 0.5
+            );
+            // Teleport
+            nearestDrone.teleport(teleportPos.x, teleportPos.y + 1, teleportPos.z);
+            // Spawn particles at new position
+            world.spawnParticles(
+                    ParticleTypes.PORTAL,
+                    teleportPos.x, teleportPos.y + 1, teleportPos.z,
+                    30, 0.5, 0.5, 0.5, 0.5
+            );
+            // Play sound
+            world.playSound(null, nearestDrone.getBlockPos(),
+                    SoundEvents.ENTITY_ENDERMAN_TELEPORT,
+                    SoundCategory.NEUTRAL, 1.0F, 1.0F);
+            String hiveCode = nearestDrone.getHiveCode();
+            context.getSource().sendFeedback(() ->
+                            Text.literal("§Teleported nearest drone ").formatted(Formatting.AQUA)
+                                    .append(Text.literal(hiveCode).formatted(Formatting.GOLD))
+                                    .append(Text.literal(" to you").formatted(Formatting.AQUA)),
+                    false);
+            return 1;
+        } catch (Exception e) {
+            context.getSource().sendError(Text.literal("Error: " + e.getMessage()));
+            return 0;
+        }
+    }
+
+    private static int healDrone(CommandContext<ServerCommandSource> context) {
+        try {
+            Entity entity = EntityArgumentType.getEntity(context, "drone");
+            if (!(entity instanceof DroneEntity drone)) {
+                context.getSource().sendError(Text.literal("Target is not a drone!"));
+                return 0;
+            }
+            ServerWorld world = (ServerWorld) drone.getWorld();
+            // Heal to full
+            drone.setHealth(drone.getMaxHealth());
+            // Spawn healing particles
+            world.spawnParticles(
+                    ParticleTypes.HEART,
+                    drone.getX(), drone.getY() + 1, drone.getZ(),
+                    10, 0.5, 0.5, 0.5, 0.1
+            );
+            // Play sound
+            world.playSound(null, drone.getBlockPos(),
+                    SoundEvents.ENTITY_PLAYER_LEVELUP,
+                    SoundCategory.NEUTRAL, 0.5F, 2.0F);
+            String hiveCode = drone.getHiveCode();
+            context.getSource().sendFeedback(() ->
+                            Text.literal("§Healed drone ").formatted(Formatting.GREEN)
+                                    .append(Text.literal(hiveCode).formatted(Formatting.GOLD))
+                                    .append(Text.literal(" to full health").formatted(Formatting.GREEN)),
+                    false);
+            return 1;
+        } catch (Exception e) {
+            context.getSource().sendError(Text.literal("Error: " + e.getMessage()));
+            return 0;
+        }
+    }
+
+    private static int damageDrone(CommandContext<ServerCommandSource> context) {
+        try {
+            Entity entity = EntityArgumentType.getEntity(context, "drone");
+            float amount = IntegerArgumentType.getInteger(context, "amount");
+            if (!(entity instanceof DroneEntity drone)) {
+                context.getSource().sendError(Text.literal("Target is not a drone!"));
+                return 0;
+            }
+            ServerWorld world = (ServerWorld) drone.getWorld();
+            // Apply damage
+            drone.damage(world.getDamageSources().generic(), amount);
+            // Spawn damage particles
+            world.spawnParticles(
+                    ParticleTypes.DAMAGE_INDICATOR,
+                    drone.getX(), drone.getY() + 1, drone.getZ(),
+                    (int) amount, 0.5, 0.5, 0.5, 0.1
+            );
+            String hiveCode = drone.getHiveCode();
+            context.getSource().sendFeedback(() ->
+                            Text.literal("§cDealt ").formatted(Formatting.RED)
+                                    .append(Text.literal(String.format("%.1f", amount)).formatted(Formatting.GOLD))
+                                    .append(Text.literal(" damaged to drone ").formatted(Formatting.RED))
+                                    .append(Text.literal(hiveCode).formatted(Formatting.GOLD)),
+                    false);
+            return 1;
+        } catch (Exception e) {
+            context.getSource().sendError(Text.literal("Error: " + e.getMessage()));
+            return 0;
+        }
     }
 }

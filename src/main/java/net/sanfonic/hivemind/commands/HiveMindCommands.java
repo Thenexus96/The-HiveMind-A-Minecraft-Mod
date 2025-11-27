@@ -424,6 +424,7 @@ public class HiveMindCommands {
                                 return 1;
                             })
             );
+            DebugCommands.registerCommands(commandDispatcher);
         }));
     }
 }

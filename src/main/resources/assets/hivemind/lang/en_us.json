@@ -1,9 +1,14 @@
 {
   "category.hivemind.general": "HiveMind",
+  "category.hivemind.debug": "HiveMind Debug",
 
   "key.hivemind.open_gui": "Open Hivemind GUI",
   "key.hivemind.quick_access": "Quick Access",
   "key.hivemind.toggle_mode": "Toggle Mod",
+  "key.hivemind.debug.toggle_overlay": "Toggle Debug Overlay",
+  "key.hivemind.debug.spawn_drone": "Spawn Debug Drone",
+  "key.hivemind.debug.kill_nearby": "Kill All Nearby Drones",
+  "key.hivemind.debug.teleport_drone": "Teleport Nearest Drone",
 
   "gui.hivemind.config.title": "HiveMind Settings",
   "gui.hivemind.config.keybinds": "Key Bindings",

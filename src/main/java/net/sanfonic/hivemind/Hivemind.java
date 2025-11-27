@@ -10,7 +10,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.sanfonic.hivemind.block.ModBlock;
-import net.sanfonic.hivemind.commands.DebugCommands;
+import net.sanfonic.hivemind.client.debug.DebugNetworkHandler;
 import net.sanfonic.hivemind.commands.DroneControlCommands;
 import net.sanfonic.hivemind.commands.HiveMindCommands;
 import net.sanfonic.hivemind.data.HiveMindData.HiveMindServerEvents;
@@ -48,7 +48,7 @@ public class Hivemind implements ModInitializer {
 		DroneControlCommands.init();
 		HiveMindServerEvents.register();
         PlayerDataEvents.register();
-        DebugCommands.init();
+        DebugNetworkHandler.register();
 
 		//Register attributes AFTER entities are registered
 		FabricDefaultAttributeRegistry.register(ModEntities.DRONE, DroneEntity.createMobAttributes());
