@@ -47,8 +47,10 @@ public class HiveMindCommands {
                 source.sendFeedback(() ->
                                 Text.literal("⚠ ").formatted(Formatting.YELLOW)
                                         .append(Text.literal("Drone ").formatted(Formatting.GRAY))
-                                        .append(Text.literal(hiveCode != null ? hiveCode : "???").formatted(Formatting.GOLD))
-                                        .append(Text.literal(" is already linked to you!").formatted(Formatting.GRAY)),
+                                        .append(Text.literal(hiveCode != null ? hiveCode : "???")
+                                                .formatted(Formatting.GOLD))
+                                        .append(Text.literal(" is already linked to you!")
+                                                .formatted(Formatting.GRAY)),
                         false
                 );
                 return false;
@@ -261,7 +263,8 @@ public class HiveMindCommands {
 
                                 if (player == null) {
                                     source.sendFeedback(() -> Text.literal(
-                                            "This command can only be executed by a player"), false);
+                                                    "This command can only be executed by a player"),
+                                            false);
                                     return 1;
                                 }
 
@@ -285,7 +288,8 @@ public class HiveMindCommands {
                                 if (unlinkedDrones.isEmpty()) {
                                     source.sendFeedback(() ->
                                                     Text.literal("⚠ ").formatted(Formatting.YELLOW)
-                                                            .append(Text.literal("No unlinked drones found within 20 blocks.")
+                                                            .append(Text.literal(
+                                                                            "No unlinked drones found within 20 blocks.")
                                                                     .formatted(Formatting.GRAY)),
                                             false
                                     );
@@ -327,9 +331,10 @@ public class HiveMindCommands {
 
                                 source.sendFeedback(() ->
                                                 Text.literal("✓ ").formatted(Formatting.GREEN)
-                                                        .append(Text.literal("Linked ").formatted(Formatting.GRAY))
-                                                        .append(Text.literal(String.valueOf(finalCount)).formatted(
-                                                                Formatting.GOLD, Formatting.BOLD)),
+                                                        .append(Text.literal("Linked ")
+                                                                .formatted(Formatting.GRAY))
+                                                        .append(Text.literal(String.valueOf(finalCount))
+                                                                .formatted(Formatting.GOLD, Formatting.BOLD)),
                                         false
                                 );
 
@@ -424,7 +429,12 @@ public class HiveMindCommands {
                                 return 1;
                             })
             );
-            DebugCommands.registerCommands(commandDispatcher);
+            var hiveCommand = CommandManager.literal("hive")
+                    .requires(source -> source.hasPermissionLevel(0));
+
+            DebugCommands.addDebugCommands(hiveCommand);
+
+            commandDispatcher.register(hiveCommand);
         }));
     }
 }
