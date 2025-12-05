@@ -1,13 +1,34 @@
 ---
 name: Feature Request
-about: Suggest new features or enhancements.
+about: Suggest a feature for HiveMind
+title: '[FEATURE] '
+labels: enhancement
+assignees: ''
 ---
 
-### Problem Description
-Clearly explain what problem you are facing that this enhancement solves.
+## Problem Statement
 
-### Proposed Solution(s)
-Provide one or more ideas or concepts about a solution.
+What problem does this feature solve?
 
-### Alternatives
-Explain what alternative features/tools/changes you have considered.
+## Proposed Solution
+
+How should this feature work?
+
+## Alternatives Considered
+
+What other solutions did you consider?
+
+## Roadmap Phase
+
+Which development phase does this fit into?
+
+- [ ] Phase 1 - Foundation
+- [ ] Phase 2 - Drone Framework
+- [ ] Phase 3 - Control Link
+- [ ] Phase 4 - Command Interface
+- [ ] Phase 5 - Advanced AI
+- [ ] Phase 6 - Optimization
+
+## Additional Context
+
+Any other information or mockups.
