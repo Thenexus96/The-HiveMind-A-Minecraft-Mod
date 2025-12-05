@@ -400,7 +400,16 @@ public class DebugCommands {
                     30, 0.5, 0.5, 0.5, 0.5
             );
 
-            drone.teleport(teleportPos.x, teleportPos.y, teleportPos.z);
+
+            // Use refreshPositionAngles for more reliable teleportation
+            drone.refreshPositionAndAngles(
+                    teleportPos.x,
+                    teleportPos.y,
+                    teleportPos.z,
+                    drone.getYaw(),
+                    drone.getPitch()
+            );
+            drone.velocityModified = true;
 
             world.spawnParticles(
                     ParticleTypes.PORTAL,
@@ -499,7 +508,14 @@ public class DebugCommands {
                     30, 0.5, 0.5, 0.5, 0.5
             );
 
-            nearestDrone.teleport(teleportPos.x, teleportPos.y, teleportPos.z);
+            nearestDrone.refreshPositionAndAngles(
+                    teleportPos.x,
+                    teleportPos.y,
+                    teleportPos.z,
+                    nearestDrone.getYaw(),
+                    nearestDrone.getPitch()
+            );
+            nearestDrone.velocityModified = true;
 
             world.spawnParticles(
                     ParticleTypes.PORTAL,
