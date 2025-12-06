@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="160b5133-85a2-4fad-8829-33d33704b77f" name="Changes" comment="">
+      <changelist_data name="Thenexus96" email="nsanford96@gmail.com" automatic="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExportToHTMLSettings">
+    <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/exportToHTML" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="/var/home/nsan/IdeaProjects/The-HiveMind-A-Minecraft-Mod">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="The-HiveMind-A-Minecraft-Mod" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="The-HiveMind-A-Minecraft-Mod" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="The-HiveMind-A-Minecraft-Mod" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build" type="c8890929:TasksNode$1" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Thenexus96 &lt;nsanford96@gmail.com&gt;" />
+      </list>
+    </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="/var/home/nsan/IdeaProjects/The HiveMind" />
+    <option name="ROOT_SYNC" value="SYNC" />
+    <option name="SIGN_OFF_COMMIT" value="true" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Thenexus96&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Thenexus96/The-HiveMind-A-Minecraft-Mod.git&quot;,
+    &quot;accountId&quot;: &quot;c66d2c5e-a64a-42dc-9291-98f9b6f233b5&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="35Uf0c4U3AsFU3FeyghBa8MRwNy" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.Build The-HiveMind-A-Minecraft-Mod.executor": "Run",
+    "Gradle.The-HiveMind-A-Minecraft-Mod::var:home:nsan:IdeaProjects:The-HiveMind-A-Minecraft-Mod [:net.fabricmc.devlaunchinjector.Main.main()].executor": "Debug",
+    "Gradle.The-HiveMind-A-Minecraft-Mod::var:home:nsan:IdeaProjects:The-HiveMind-A-Minecraft-Mod [build].executor": "Debug",
+    "Gradle.The-HiveMind-A-Minecraft-Mod::var:home:nsan:IdeaProjects:The-HiveMind-A-Minecraft-Mod [clean].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "creation",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/nsan/IdeaProjects/The HiveMind",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "settings.sync"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="/var/home/nsan/IdeaProjects/The-HiveMind-A-Minecraft-Mod/src/main/resources/assets/hivemind/textures/item" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Gradle.The-HiveMind-A-Minecraft-Mod::var:home:nsan:IdeaProjects:The-HiveMind-A-Minecraft-Mod [build]">
+    <configuration name="The-HiveMind-A-Minecraft-Mod::var:home:nsan:IdeaProjects:The-HiveMind-A-Minecraft-Mod [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="/var/home/nsan/IdeaProjects/The-HiveMind-A-Minecraft-Mod" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="build" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="The-HiveMind-A-Minecraft-Mod::var:home:nsan:IdeaProjects:The-HiveMind-A-Minecraft-Mod [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="/var/home/nsan/IdeaProjects/The-HiveMind-A-Minecraft-Mod" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.The-HiveMind-A-Minecraft-Mod::var:home:nsan:IdeaProjects:The-HiveMind-A-Minecraft-Mod [build]" />
+        <item itemvalue="Gradle.The-HiveMind-A-Minecraft-Mod::var:home:nsan:IdeaProjects:The-HiveMind-A-Minecraft-Mod [clean]" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="160b5133-85a2-4fad-8829-33d33704b77f" name="Changes" comment="" />
+      <created>1763169348650</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1763169348650</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Plugging through the current Road Map. Getting Drones more represenation and poked at things" />
+    <MESSAGE value="{&#10;    &quot;error&quot;: {&#10;        &quot;message&quot;: &quot;You didn't provide an API key. You need to provide your API key in an Authorization header using Bearer auth (i.e. Authorization: Bearer YOUR_KEY), or as the password field (with blank username) if you're accessing the API from your browser and are prompted for a username and password. You can obtain an API key from https://platform.openai.com/account/api-keys.&quot;,&#10;        &quot;type&quot;: &quot;invalid_request_error&quot;,&#10;        &quot;param&quot;: null,&#10;        &quot;code&quot;: null&#10;    }&#10;}" />
+    <MESSAGE value="feat(core): Add debug commands and config options&#10;&#10;Adds debug commands for drone control and config options.&#10;Includes DroneDebugOverlay. Also refactors drone linking and hive code logic." />
+    <MESSAGE value="feat(core): Implement debug features and keybindings&#10;&#10;Adds debug commands, keybindings, and overlay.&#10;Also, networking is implemented for server interaction." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(core): Implement debug features and keybindings&#10;&#10;Adds debug commands, keybindings, and overlay.&#10;Also, networking is implemented for server interaction." />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+</project>
