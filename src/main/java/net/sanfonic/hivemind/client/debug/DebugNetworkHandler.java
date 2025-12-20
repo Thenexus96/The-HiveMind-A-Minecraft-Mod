@@ -186,6 +186,8 @@ public class DebugNetworkHandler {
 
         // Teleport
         nearestDrone.teleport(teleportPos.x, teleportPos.y, teleportPos.z);
+        nearestDrone.setVelocity(0, 0, 0);
+        nearestDrone.velocityModified = true;
 
         // Spawn particles at new position
         world.spawnParticles(

@@ -1,4 +1,4 @@
-# Phase 2-2 Debug System Testing Checklist
+Phase 2-2 Debug System Testing Checklist
 
 ## Pre-Test Setup
 
@@ -76,12 +76,12 @@
 /hive debug spawn
 ```
 
-- [ ] Spawns 1 drone near player
-- [ ] Shows "✓ Spawned 1 debug drone(s)"
-- [ ] Drone appears with particles
-- [ ] Sound plays (beacon power select)
-- [ ] Drone is auto-linked (if `debugAutoLink` is true)
-- [ ] Drone has a HiveCode (D-001, D-002, etc.)
+- [x] Spawns 1 drone near player
+- [x] Shows "✓ Spawned 1 debug drone(s)"
+- [x] Drone appears with particles
+- [x] Sound plays (beacon power select)
+- [x] Drone is auto-linked (if `debugAutoLink` is true)
+- [x] Drone has a HiveCode (D-001, D-002, etc.)
 
 **Multiple Drones:**
 
@@ -89,11 +89,11 @@
 /hive debug spawn 5
 ```
 
-- [ ] Spawns 5 drones in circle around player
-- [ ] Each at ~5 blocks away (debugSpawnRadius)
-- [ ] All spawn successfully
-- [ ] All have unique HiveCodes
-- [ ] Shows "✓ Spawned 5 debug drone(s)"
+- [x] Spawns 5 drones in circle around player
+- [x] Each at ~5 blocks away (debugSpawnRadius)
+- [x] All spawn successfully
+- [x] All have unique HiveCodes
+- [x] Shows "✓ Spawned 5 debug drone(s)"
 
 **Maximum Test:**
 
@@ -101,9 +101,9 @@
 /hive debug spawn 10
 ```
 
-- [ ] Spawns 10 drones (max allowed)
-- [ ] No crashes or errors
-- [ ] All drones are functional
+- [x] Spawns 10 drones (max allowed)
+- [x] No crashes or errors
+- [x] All drones are functional
 
 ### E. Drone Info Command
 
@@ -116,14 +116,14 @@
 /hive debug info @e[type=hivemind:drone,limit=1,sort=nearest]
 ```
 
-- [ ] Shows "=== Drone Debug Info ==="
-- [ ] Displays HiveCode in aqua color
-- [ ] Shows full UUID
-- [ ] Shows Health (e.g., 40.0/40.0)
-- [ ] Shows Role (e.g., "Idle")
-- [ ] Shows Position (x, y, z coordinates)
-- [ ] Shows Owner UUID (or "None")
-- [ ] Shows "AI Paused: false"
+- [x] Shows "=== Drone Debug Info ==="
+- [x] Displays HiveCode in aqua color
+- [x] Shows full UUID
+- [x] Shows Health (e.g., 40.0/40.0)
+- [x] Shows Role (e.g., "Idle")
+- [x] Shows Position (x, y, z coordinates)
+- [x] Shows Owner UUID (or "None")
+- [x] Shows "AI Paused: false"
 
 ### F. Role Change Command
 
@@ -131,9 +131,9 @@
 /hive debug setrole @e[type=hivemind:drone,limit=1,sort=nearest] scout
 ```
 
-- [ ] Message: "✓ Changed drone role from Idle to Scout"
-- [ ] Drone's role actually changes (check with info command)
-- [ ] Drone behavior changes (scouts wander more)
+- [x] Message: "✓ Changed drone role from Idle to Scout"
+- [x] Drone's role actually changes (check with info command)
+- [x] Drone behavior changes (scouts wander more)
 
 **Try other roles:**
 
@@ -143,8 +143,8 @@
 /hive debug setrole @e[type=hivemind:drone,limit=1,sort=nearest] guard
 ```
 
-- [ ] Each role change works
-- [ ] No errors in console
+- [x] Each role change works
+- [x] No errors in console
 
 ### G. Teleport Commands
 
@@ -155,10 +155,10 @@
 ```
 
 - [ ] Drone appears in front of you
-- [ ] Purple portal particles at old position
-- [ ] Purple portal particles at new position
-- [ ] Enderman teleport sound
-- [ ] Message shows HiveCode
+- [x] Purple portal particles at old position
+- [x] Purple portal particles at new position
+- [x] Enderman teleport sound
+- [x] Message shows HiveCode
 
 **Teleport Player to Drone:**
 
@@ -167,9 +167,9 @@
 ```
 
 - [ ] You teleport to drone's location
-- [ ] Portal particles at both locations
-- [ ] Teleport sound plays
-- [ ] Message confirms teleport
+- [x] Portal particles at both locations
+- [x] Teleport sound plays
+- [x] Message confirms teleport
 
 **Teleport Nearest Drone:**
 
@@ -177,9 +177,9 @@
 /hive debug teleport nearest
 ```
 
-- [ ] Finds nearest drone
+- [x] Finds nearest drone
 - [ ] Teleports it to you
-- [ ] Proper particles and sound
+- [x] Proper particles and sound
 - [ ] Works even if you're not looking at a drone
 
 ### H. Health Modification Commands
@@ -190,10 +190,10 @@
 /hive debug heal @e[type=hivemind:drone,limit=1,sort=nearest]
 ```
 
-- [ ] Drone heals to full health (40/40)
+- [x] Drone heals to full health (40/40)
 - [ ] Pink heart particles appear
 - [ ] Level-up sound plays
-- [ ] Message confirms healing
+- [x] Message confirms healing
 
 **Damage Drone:**
 
@@ -201,10 +201,10 @@
 /hive debug damage @e[type=hivemind:drone,limit=1,sort=nearest] 10
 ```
 
-- [ ] Drone takes 10 damage
+- [x] Drone takes 10 damage
 - [ ] Red damage indicator particles
-- [ ] Message shows damage dealt
-- [ ] Health decreases (verify with info command)
+- [x] Message shows damage dealt
+- [x] Health decreases (verify with info command)
 
 **Kill Test:**
 

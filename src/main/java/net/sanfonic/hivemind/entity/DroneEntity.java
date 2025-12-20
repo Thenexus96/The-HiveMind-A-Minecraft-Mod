@@ -439,6 +439,9 @@ public class DroneEntity extends PathAwareEntity {
         this.currentRole = newRole;
         this.roleBehavior = RoleRegistry.getBehavior(newRole);
 
+        // Apply new behavior
+        applyRoleBehavior();
+
         // Log Change
         ModConfig.getInstance().droneLinkDebugLog(
                 "Drone role changed from " + oldRole.getDisplayName() + " to " + newRole.getDisplayName()
