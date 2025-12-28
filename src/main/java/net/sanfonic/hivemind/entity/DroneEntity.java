@@ -442,10 +442,12 @@ public class DroneEntity extends PathAwareEntity {
         // Apply new behavior
         applyRoleBehavior();
 
-        // Log Change
-        ModConfig.getInstance().droneLinkDebugLog(
-                "Drone role changed from " + oldRole.getDisplayName() + " to " + newRole.getDisplayName()
-        );
+        // Debug log
+        if (!this.getWorld().isClient) {
+            System.out.println("[HiveMind] Drone " + getHiveCode() +
+                    " role changed from " + oldRole.getDisplayName() +
+                    " to " + newRole.getDisplayName());
+        }
     }
 
     // Get the current role behavior
@@ -1008,6 +1010,10 @@ public class DroneEntity extends PathAwareEntity {
             this.prevZ = z;
         } else {
             super.updatePosition(x, y, z);
+        }
+
+        if (!this.getWorld().isClient) {
+            this.velocityDirty = true;
         }
     }
 }

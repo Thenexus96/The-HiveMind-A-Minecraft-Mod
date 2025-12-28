@@ -22,6 +22,7 @@ import net.sanfonic.hivemind.data.player.PlayerHiveComponent;
 import net.sanfonic.hivemind.entity.DroneEntity;
 import net.sanfonic.hivemind.entity.ModEntities;
 import net.sanfonic.hivemind.entity.custom.role.DroneRole;
+import org.joml.Vector3d;
 
 import java.util.List;
 import java.util.UUID;
@@ -267,6 +268,11 @@ public class DebugCommands {
             drone.setRole(newRole);
             drone.applyRoleBehavior();
 
+            // Force the drone to update its state to all nearby players
+            ServerWorld serverWorld = (ServerWorld) drone.getWorld();
+            serverWorld.getChunkManager().sendToNearbyPlayers(drone,
+                    drone.createSpawnPacket()); // This forces a full entity update
+
             context.getSource().sendFeedback(() ->
                             Text.literal("✓ Changed drone role from ").formatted(Formatting.GREEN)
                                     .append(Text.literal(oldRole.getDisplayName()).formatted(Formatting.YELLOW))
@@ -398,34 +404,7 @@ public class DebugCommands {
             Vec3d lookVec = player.getRotationVector().multiply(3.0);
             Vec3d teleportPos = player.getPos().add(lookVec);
 
-            // Spawn particles at OLD position
-            world.spawnParticles(
-                    ParticleTypes.PORTAL,
-                    drone.getX(), drone.getY() + 1, drone.getZ(),
-                    30, 0.5, 0.5, 0.5, 0.5
-            );
-
-            // FIXED use teleport method instead of refreshPositionAndAngles
-            // Method 1: Simple teleport (doesn't preserve rotation)
-            drone.teleport(teleportPos.x, teleportPos.y, teleportPos.z);
-
-            // Method 2: If you need to preserve/set rotation, do it after:
-            drone.setYaw(drone.getYaw());
-            drone.setPitch(drone.getPitch());
-
-            // Force Velocity update to ensure sync
-            drone.setVelocity(0, 0, 0);
-            drone.velocityModified = true;
-
-            world.spawnParticles(
-                    ParticleTypes.PORTAL,
-                    teleportPos.x, teleportPos.y + 1, teleportPos.z,
-                    30, 0.5, 0.5, 0.5, 0.5
-            );
-
-            world.playSound(null, drone.getBlockPos(),
-                    SoundEvents.ENTITY_ENDERMAN_TELEPORT,
-                    SoundCategory.NEUTRAL, 1.0F, 1.0F);
+            teleportDroneWithSync(drone, teleportPos, world);
 
             String hiveCode = drone.getHiveCode();
             context.getSource().sendFeedback(() ->
@@ -438,6 +417,7 @@ public class DebugCommands {
 
         } catch (Exception e) {
             context.getSource().sendError(Text.literal("Error: " + e.getMessage()));
+            e.printStackTrace();
             return 0;
         }
     }
@@ -497,7 +477,8 @@ public class DebugCommands {
                             player.getBoundingBox().expand(100),
                             drone -> true
                     ).stream()
-                    .min((d1, d2) -> Double.compare(player.distanceTo(d1), player.distanceTo(d2)))
+                    .min((d1, d2) -> Double.compare(player.distanceTo(d1),
+                            player.distanceTo(d2)))
                     .orElse(null);
 
             if (nearestDrone == null) {
@@ -514,10 +495,13 @@ public class DebugCommands {
                     30, 0.5, 0.5, 0.5, 0.5
             );
 
+            // Critical Fix: Proper teleport with client sync
             nearestDrone.teleport(teleportPos.x, teleportPos.y, teleportPos.z);
             nearestDrone.setVelocity(0, 0, 0);
-            nearestDrone.velocityModified = true;
+            nearestDrone.velocityDirty = true;
 
+            world.getChunkManager().sendToNearbyPlayers(nearestDrone,
+                    new net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket(nearestDrone));
 
             world.spawnParticles(
                     ParticleTypes.PORTAL,
@@ -540,8 +524,38 @@ public class DebugCommands {
 
         } catch (Exception e) {
             context.getSource().sendError(Text.literal("Error: " + e.getMessage()));
+            e.printStackTrace();
             return 0;
         }
+    }
+
+    private static void teleportDroneWithSync(DroneEntity drone, Vector3d targetPos, ServerWorld world) {
+        // Store old position for particle effects
+        Vec3d oldPos = drone.getPos();
+
+        // Teleport
+        drone.teleport(targetPos.x, targetPos.y, targetPos.z);
+        drone.setVelocity(0, 0, 0);
+        drone.velocityDirty = true;
+
+        // Force sync to clients
+        world.getChunkManager().sendToNearbyPlayers(drone,
+                new net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket(drone));
+
+        // Particles at old position
+        world.spawnParticles(ParticleTypes.PORTAL,
+                oldPos.x, oldPos.y + 1, oldPos.z,
+                30, 0.5, 0.5, 0.5, 0.5);
+
+        // Particles at new position
+        world.spawnParticles(ParticleTypes.PORTAL,
+                targetPos.x, targetPos.y + 1, targetPos.z,
+                30, 0.5, 0.5, 0.5, 0.5);
+
+        // Sound effect
+        world.playSound(null, drone.getBlockPos(),
+                SoundEvents.ENTITY_ENDERMAN_TELEPORT,
+                SoundCategory.NEUTRAL, 1.0F, 1.0F);
     }
 
     private static int healDrone(CommandContext<ServerCommandSource> context) {
