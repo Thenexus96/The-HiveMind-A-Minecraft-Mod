@@ -1,0 +1,43 @@
+#-------------------------------------------------------------------------------#
+#            Discover all capabilities of Qodana in our documentation           #
+#             https://www.jetbrains.com/help/qodana/about-qodana.html           #
+#-------------------------------------------------------------------------------#
+# NOTE: This workflow is designed for GitHub and may have limited functionality
+# in Gitea. Features like PR comments and annotations may not work fully.
+# Consider running Qodana locally or keeping this workflow for GitHub mirror only.
+#-------------------------------------------------------------------------------#
+
+name: Qodana
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - creation
+
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    # Note: Gitea permissions may differ from GitHub
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v2025.2
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        with:
+          pr-mode: false
+          use-caches: true
+          # These features may not work in Gitea:
+          post-pr-comment: false  # Changed to false - likely won't work in Gitea
+          use-annotations: false   # Changed to false - likely won't work in Gitea
+          upload-result: true      # Changed to true - at least save the results
+          push-fixes: 'none'
