@@ -27,6 +27,8 @@ import org.joml.Vector3d;
 import java.util.List;
 import java.util.UUID;
 
+// Testing the commits to the new repo. Will delete
+
 public class DebugCommands {
 
     public static void addDebugCommands(LiteralArgumentBuilder<ServerCommandSource> hiveCommand) {
