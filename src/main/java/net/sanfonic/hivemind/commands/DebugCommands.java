@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -22,7 +23,6 @@ import net.sanfonic.hivemind.data.player.PlayerHiveComponent;
 import net.sanfonic.hivemind.entity.DroneEntity;
 import net.sanfonic.hivemind.entity.ModEntities;
 import net.sanfonic.hivemind.entity.custom.role.DroneRole;
-import org.joml.Vector3d;
 
 import java.util.List;
 import java.util.UUID;
@@ -406,6 +406,7 @@ public class DebugCommands {
             Vec3d lookVec = player.getRotationVector().multiply(3.0);
             Vec3d teleportPos = player.getPos().add(lookVec);
 
+            // Use the utility method
             teleportDroneWithSync(drone, teleportPos, world);
 
             String hiveCode = drone.getHiveCode();
@@ -491,6 +492,8 @@ public class DebugCommands {
             Vec3d lookVec = player.getRotationVector().multiply(3.0);
             Vec3d teleportPos = player.getPos().add(lookVec);
 
+            teleportDroneWithSync(nearestDrone, teleportPos, world);
+
             world.spawnParticles(
                     ParticleTypes.PORTAL,
                     nearestDrone.getX(), nearestDrone.getY() + 1, nearestDrone.getZ(),
@@ -531,7 +534,7 @@ public class DebugCommands {
         }
     }
 
-    private static void teleportDroneWithSync(DroneEntity drone, Vector3d targetPos, ServerWorld world) {
+    private static void teleportDroneWithSync(DroneEntity drone, Vec3d targetPos, ServerWorld world) {
         // Store old position for particle effects
         Vec3d oldPos = drone.getPos();
 
@@ -542,7 +545,7 @@ public class DebugCommands {
 
         // Force sync to clients
         world.getChunkManager().sendToNearbyPlayers(drone,
-                new net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket(drone));
+                new EntityPositionS2CPacket(drone));
 
         // Particles at old position
         world.spawnParticles(ParticleTypes.PORTAL,

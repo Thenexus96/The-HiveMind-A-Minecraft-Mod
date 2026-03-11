@@ -1,0 +1,117 @@
+name: Build (Split Jobs)
+
+on:
+  push:
+    branches: [ creation, testing, pre-release, main ]
+  pull_request:
+    branches: [ creation, testing, pre-release, main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Job 1: Setup and cache dependencies
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Gradle
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/caches/fabric-loom
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Download dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          chmod +x gradlew
+          ./gradlew dependencies --no-daemon
+
+  # Job 2: Actual build (reuses cache from setup)
+  build:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Restore Gradle cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/caches/fabric-loom
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build --build-cache --parallel --no-daemon
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: success()
+        with:
+          name: hivemind-mod-${{ github.ref_name }}-${{ github.sha }}
+          path: build/libs/*.jar
+          retention-days: 30
+
+  # Job 3: Tests (parallel with build if you separate them)
+  test:
+    runs-on: ubuntu-latest
+    needs: setup
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Restore Gradle cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+
+      - name: Grant execute permission
+        run: chmod +x gradlew
+
+      - name: Run tests
+        run: ./gradlew test --no-daemon
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-results
+          path: build/reports/tests/
