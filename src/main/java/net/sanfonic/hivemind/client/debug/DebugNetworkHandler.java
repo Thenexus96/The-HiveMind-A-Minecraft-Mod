@@ -21,7 +21,8 @@ public class DebugNetworkHandler {
     public static void register() {
         // Register debug spawn packet handler
         ServerPlayNetworking.registerGlobalReceiver(DebugKeyBindings.DEBUG_SPAWN_PACKET,
-                (server, player, handler, buf, responseSender) -> {
+                (server, player,
+                 handler, buf, responseSender) -> {
                     int count = buf.readInt();
 
                     server.execute(() -> {
@@ -31,7 +32,8 @@ public class DebugNetworkHandler {
 
         // Register debug kill nearby packet handler
         ServerPlayNetworking.registerGlobalReceiver(DebugKeyBindings.DEBUG_KILL_NEARBY_PACKET,
-                (server, player, handler, buf, responseSender) -> {
+                (server, player,
+                 handler, buf, responseSender) -> {
                     int radius = buf.readInt();
 
                     server.execute(() -> {
@@ -41,7 +43,8 @@ public class DebugNetworkHandler {
 
         // Register debug teleport packet handler
         ServerPlayNetworking.registerGlobalReceiver(DebugKeyBindings.DEBUG_TELEPORT_PACKET,
-                (server, player, handler, buf, responseSender) -> {
+                (server, player,
+                 handler, buf, responseSender) -> {
                     server.execute(() -> {
                         handleDebugTeleport(player);
                     });
@@ -165,7 +168,8 @@ public class DebugNetworkHandler {
                         player.getBoundingBox().expand(100),
                         drone -> true
                 ).stream()
-                .min((d1, d2) -> Double.compare(player.distanceTo(d1), player.distanceTo(d2)))
+                .min((d1, d2) ->
+                        Double.compare(player.distanceTo(d1), player.distanceTo(d2)))
                 .orElse(null);
 
         if (nearestDrone == null) {
@@ -186,6 +190,12 @@ public class DebugNetworkHandler {
 
         // Teleport
         nearestDrone.teleport(teleportPos.x, teleportPos.y, teleportPos.z);
+        nearestDrone.setVelocity(0, 0, 0);
+        nearestDrone.velocityDirty = true;
+
+        // Force entity tracker update
+        world.getChunkManager().sendToNearbyPlayers(nearestDrone,
+                new net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket(nearestDrone));
 
         // Spawn particles at new position
         world.spawnParticles(

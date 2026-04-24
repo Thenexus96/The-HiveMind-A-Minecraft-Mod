@@ -13,12 +13,14 @@ import net.sanfonic.hivemind.block.ModBlock;
 import net.sanfonic.hivemind.client.debug.DebugNetworkHandler;
 import net.sanfonic.hivemind.commands.DroneControlCommands;
 import net.sanfonic.hivemind.commands.HiveMindCommands;
+import net.sanfonic.hivemind.control.DroneControlManager;
 import net.sanfonic.hivemind.data.HiveMindData.HiveMindServerEvents;
 import net.sanfonic.hivemind.data.player.PlayerDataEvents;
 import net.sanfonic.hivemind.entity.DroneEntity;
 import net.sanfonic.hivemind.entity.ModEntities;
 import net.sanfonic.hivemind.item.ModItemGroups;
 import net.sanfonic.hivemind.item.ModItems;
+import net.sanfonic.hivemind.network.NetworkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +48,8 @@ public class Hivemind implements ModInitializer {
 		ModBlock.registerModBlocks();
 		HiveMindCommands.register();
 		DroneControlCommands.init();
+		DroneControlManager.init();
+		NetworkHandler.init();
 		HiveMindServerEvents.register();
         PlayerDataEvents.register();
         DebugNetworkHandler.register();

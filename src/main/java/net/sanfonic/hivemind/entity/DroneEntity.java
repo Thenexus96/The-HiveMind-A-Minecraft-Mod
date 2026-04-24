@@ -439,10 +439,15 @@ public class DroneEntity extends PathAwareEntity {
         this.currentRole = newRole;
         this.roleBehavior = RoleRegistry.getBehavior(newRole);
 
-        // Log Change
-        ModConfig.getInstance().droneLinkDebugLog(
-                "Drone role changed from " + oldRole.getDisplayName() + " to " + newRole.getDisplayName()
-        );
+        // Apply new behavior
+        applyRoleBehavior();
+
+        // Debug log
+        if (!this.getWorld().isClient) {
+            System.out.println("[HiveMind] Drone " + getHiveCode() +
+                    " role changed from " + oldRole.getDisplayName() +
+                    " to " + newRole.getDisplayName());
+        }
     }
 
     // Get the current role behavior
@@ -616,32 +621,30 @@ public class DroneEntity extends PathAwareEntity {
     public void onTrackedDataSet(TrackedData<?> data) {
         super.onTrackedDataSet(data);
 
-            if (this.getWorld().isClient) {
-                // Check if this drone is being controlled by the local player
-                boolean isLocallyControlled = false;
-
+        if (this.getWorld().isClient) {
+            // Never let server rotation updates override the drone the local player is actively piloting.
+            if (data.equals(DRONE_YAW) || data.equals(DRONE_PITCH)) {
                 try {
-                    isLocallyControlled = net.sanfonic.hivemind.client.DroneClientHandler.isControllingDrone() &&
-                            DroneClientHandler.getControlledDrone() == this;
+                    Integer controlledDroneId = DroneClientHandler.getControlledDroneId();
+                    if (DroneClientHandler.isControllingDrone() && controlledDroneId != null &&
+                            controlledDroneId == this.getId()) {
+                        return;
+                    }
                 } catch (Exception e) {
-                // if client handler isn't available, assume not controlled
-                isLocallyControlled = false;
+                    // If client handler isn't available, fall back to normal sync behavior.
+                }
             }
 
-            // Only apply server rotation if we're NOT locally controlling this drone
-            // This prevents the controlling client from having input overridden
-            if (!isLocallyControlled()) {
-                if (data.equals(DRONE_YAW)) {
-                    float syncedYaw = this.dataTracker.get(DRONE_YAW);
-                    this.setYaw(syncedYaw);
-                    this.setHeadYaw(syncedYaw);
-                    this.bodyYaw = syncedYaw;
-                    this.prevYaw = syncedYaw;
-                } else if (data.equals(DRONE_PITCH)) {
-                    float syncedPitch = this.dataTracker.get(DRONE_PITCH);
-                    this.setPitch(syncedPitch);
-                    this.prevPitch = syncedPitch;
-                }
+            if (data.equals(DRONE_YAW)) {
+                float syncedYaw = this.dataTracker.get(DRONE_YAW);
+                this.setYaw(syncedYaw);
+                this.setHeadYaw(syncedYaw);
+                this.bodyYaw = syncedYaw;
+                this.prevYaw = syncedYaw;
+            } else if (data.equals(DRONE_PITCH)) {
+                float syncedPitch = this.dataTracker.get(DRONE_PITCH);
+                this.setPitch(syncedPitch);
+                this.prevPitch = syncedPitch;
             }
         }
     }
@@ -795,53 +798,34 @@ public class DroneEntity extends PathAwareEntity {
 
     @Override
     public void tick() {
-        if (isBeingControlled()) {
-            // Store position before tick
-            double preX = this.getX();
-            double preY = this.getY();
-            double preZ = this.getZ();
-            float preYaw = this.getYaw();
-            float prePitch = this.getPitch();
+        super.tick();
 
-            super.tick();
+        if (this.getWorld().isClient) {
+            handleClientVisualEffects();
+            return;
+        }
 
-            // Restore position if it changed unexpectedly (prevent camera jumps)
-            if (!this.getWorld().isClient && isBeingControlled()) {
-                // Only on server side, let client handle smooth movement
+        if (!aiControlPaused) {
+            runAITick();
+        }
+
+        if (this.hiveMindOwnerUuid != null) {
+            ModConfig config = ModConfig.getInstance();
+
+            // Only log if drone linking debug is enabled AND (owner changed OR enough time has passed)
+            if (config.isDroneLinkingDebugEnabled() &&
+                    (!Objects.equals(this.previousOwnerUuid, this.hiveMindOwnerUuid) ||
+                            (System.currentTimeMillis() - this.lastLogTime > config.getLogCooldownMillis()))) {
+
+                config.droneLinkDebugLog("Drone is linked to: " + this.hiveMindOwnerUuid);
+                this.previousOwnerUuid = this.hiveMindOwnerUuid;
+                this.lastLogTime = System.currentTimeMillis();
             }
+        }
 
-            // Handle visual effects on client side
-            if (this.getWorld().isClient) {
-                handleClientVisualEffects();
-                return;
-            }
-
-            // Server-side logic only below
-            if (!this.getWorld().isClient) {
-                //Only run AI Logic if not player controlled
-                if (!aiControlPaused) {
-                    runAITick();
-                }
-
-                if (this.hiveMindOwnerUuid != null) {
-                    ModConfig config = ModConfig.getInstance();
-
-                    // Only log if drone linking debug is enabled AND (owner changed OR enough time has passed)
-                    if (config.isDroneLinkingDebugEnabled() &&
-                            (!Objects.equals(this.previousOwnerUuid, this.hiveMindOwnerUuid) ||
-                                    (System.currentTimeMillis() - this.lastLogTime > config.getLogCooldownMillis()))) {
-
-                        config.droneLinkDebugLog("Drone is linked to: " + this.hiveMindOwnerUuid);
-                        this.previousOwnerUuid = this.hiveMindOwnerUuid;
-                        this.lastLogTime = System.currentTimeMillis();
-                    }
-                }
-
-                // Role Specific tick behavior
-                if (this.roleBehavior != null) {
-                    this.roleBehavior.tick(this);
-                }
-            }
+        // Role Specific tick behavior
+        if (this.roleBehavior != null) {
+            this.roleBehavior.tick(this);
         }
     }
 
@@ -1005,6 +989,10 @@ public class DroneEntity extends PathAwareEntity {
             this.prevZ = z;
         } else {
             super.updatePosition(x, y, z);
+        }
+
+        if (!this.getWorld().isClient) {
+            this.velocityDirty = true;
         }
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.sanfonic.hivemind.config.ModConfig;
 import net.sanfonic.hivemind.entity.DroneEntity;
+import net.sanfonic.hivemind.entity.custom.role.DroneRole;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -136,7 +137,8 @@ public class DroneDebugOverlay {
         }
         lines.add(healthColor + String.format("%.1f/%.1f HP", health, maxHealth));
 
-        // Line 3: Role
+        // Line 3: Role (Important: Get fresh from entity, not cached)
+        DroneRole currentRole = drone.getRole();
         lines.add("§7Role: §e" + drone.getRole().getDisplayName());
 
         // Line 4: Owner
@@ -151,7 +153,7 @@ public class DroneDebugOverlay {
             lines.add("§7Owner: §cNone");
         }
 
-        // Line 5: Distance
+        // Line 5: Distance (recalculate every time
         double distance = client.player.distanceTo(drone);
         lines.add("§7Distance: §b" + String.format("%.1fm", distance));
 
