@@ -649,13 +649,13 @@ public class DebugCommands {
             // Position Info
             Vec3d pos = drone.getPos();
             context.getSource().sendFeedback(() ->
-                    Text.literal(String.format("Velocity: %2f, %.2f, %2f", pos.x, pos.y, pos.z))
+                    Text.literal(String.format("Position: %.2f, %.2f, %.2f", pos.x, pos.y, pos.z))
                             .formatted(Formatting.WHITE), false);
 
             // Velocity info
             Vec3d vel = drone.getVelocity();
             context.getSource().sendFeedback(() ->
-                    Text.literal(String.format("Position: %3.f, %3.f, %3.f", pos.x, pos.y, pos.z))
+                    Text.literal(String.format("Velocity: %.2f, %.2f, %.2f", vel.x, vel.y, vel.z))
                             .formatted(Formatting.WHITE), false);
 
             // Entity State
