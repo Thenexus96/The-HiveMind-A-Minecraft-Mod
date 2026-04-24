@@ -87,9 +87,9 @@ public record DroneMovementPacket(float forward, float strafe, float up, boolean
 
         // Calculate right direction vector (perpendicular to forward, on horizontal plane)
         Vec3d rightDir = new Vec3d(
-                Math.cos(yawRad),
+                -Math.cos(yawRad),
                 0,
-                Math.sin(yawRad)
+                -Math.sin(yawRad)
         );
 
         // Calculate up direction vector (always world up)

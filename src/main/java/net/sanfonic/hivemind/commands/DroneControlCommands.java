@@ -11,7 +11,6 @@ import net.minecraft.text.Text;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.sanfonic.hivemind.control.DroneControlManager;
-import net.sanfonic.hivemind.control.DroneControlSession;
 import net.sanfonic.hivemind.entity.DroneEntity;
 
 public class DroneControlCommands {
@@ -23,18 +22,18 @@ public class DroneControlCommands {
     }
 
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
-        CommandManager.literal("list")
-                .executes(DroneControlCommands::listDrones)
-                .then(dispatcher.register(CommandManager.literal("hivemind")
-                        .then(CommandManager.literal("control")
-                                .then(CommandManager.argument("drone", EntityArgumentType.entity())
-                                        .executes(DroneControlCommands::controlDrone)))
-                        .then(CommandManager.literal("release")
-                                .executes(DroneControlCommands::releaseControl))))
+        dispatcher.register(CommandManager.literal("hivemind")
+                .then(CommandManager.literal("control")
+                        .then(CommandManager.argument("drone", EntityArgumentType.entity())
+                                .executes(DroneControlCommands::controlDrone)))
+                .then(CommandManager.literal("release")
+                        .executes(DroneControlCommands::releaseControl))
+                .then(CommandManager.literal("list")
+                        .executes(DroneControlCommands::listDrones))
                 .then(CommandManager.literal("controlnearest")
                         .executes(DroneControlCommands::controlNearestDrone)
                         .then(CommandManager.argument("range", IntegerArgumentType.integer(1, 100))
-                                .executes(DroneControlCommands::controlNearestDroneWithRange)));
+                                .executes(DroneControlCommands::controlNearestDroneWithRange))));
     }
 
     private static int controlDrone(CommandContext<ServerCommandSource> context) {
