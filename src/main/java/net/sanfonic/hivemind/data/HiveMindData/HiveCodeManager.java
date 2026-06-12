@@ -267,7 +267,7 @@ public class HiveCodeManager extends PersistentState {
         codeToOwner.clear();
         for (Map.Entry<UUID, String> entry : droneToCode.entrySet()) {
             codeToDrone.put(entry.getValue(), entry.getKey());
-            // Note: owner mapping will need to be rebuilt from HiveMindDataManager
+            // Note: owner mapping will need to be rebuilt from HiveMindLinkManager
         }
 
         markDirty();

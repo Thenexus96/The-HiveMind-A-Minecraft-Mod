@@ -209,13 +209,14 @@ public class DroneEntity extends PathAwareEntity {
             return;
         }
 
-        HiveMindDataManager dataManager = HiveMindDataManager.getInstance(server);
-        if (dataManager == null) {
-            log.warn("HiveMindDataManager is null, cannot restore drone connection");
+        // Use the new link manager to query owner mappings
+        HiveMindLinkManager linkManager = HiveMindLinkManager.getInstance(server);
+        if (linkManager == null) {
+            log.warn("HiveMindLinkManager is null, cannot restore drone connection");
             return;
         }
 
-        UUID ownerUUID = dataManager.getDroneOwner(this.getUuid());
+        UUID ownerUUID = linkManager.getDroneOwner(this.getUuid());
 
         if (ownerUUID != null) {
             log.debug("Found owner UUID: {}", ownerUUID);
@@ -223,18 +224,21 @@ public class DroneEntity extends PathAwareEntity {
             // Set the owner UUID
             this.hiveMindOwnerUuid = ownerUUID;
 
-            // Update the drone's data in the manager with current position/health
+            // Update the drone's telemetry store with current position/health
             String dimensionKey = this.getWorld().getRegistryKey().getValue().toString();
-            dataManager.updateDroneData(
-                    this.getUuid(),
-                    ownerUUID,
-                    this.getX(),
-                    this.getY(),
-                    this.getZ(),
-                    dimensionKey,
-                    this.getHealth(),
-                    this.getMaxHealth()
-            );
+            DroneTelemetryStore telemetry = DroneTelemetryStore.getInstance(server);
+            if (telemetry != null) {
+                telemetry.updateDroneData(
+                        this.getUuid(),
+                        ownerUUID,
+                        this.getX(),
+                        this.getY(),
+                        this.getZ(),
+                        dimensionKey,
+                        this.getHealth(),
+                        this.getMaxHealth()
+                );
+            }
 
             // Restore HiveCode
             HiveCodeManager codeManager = HiveCodeManager.getInstance(server);
@@ -320,9 +324,9 @@ public class DroneEntity extends PathAwareEntity {
         if (!this.getWorld().isClient) {
             MinecraftServer server = this.getWorld().getServer();
             if (server != null) {
-                HiveMindDataManager dataManager = HiveMindDataManager.getInstance(server);
-                if (dataManager != null) {
-                    dataManager.unlinkDrone(this.getUuid());
+                HiveMindLinkManager linkManager = HiveMindLinkManager.getInstance(server);
+                if (linkManager != null) {
+                    linkManager.unlinkDrone(this.getUuid());
                 }
 
                 // NEW: Remove HiveCode

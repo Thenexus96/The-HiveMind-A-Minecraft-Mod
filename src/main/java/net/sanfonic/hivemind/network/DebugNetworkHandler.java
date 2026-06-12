@@ -154,7 +154,19 @@ public class DebugNetworkHandler {
         }
 
         Vec3d lookVec = player.getRotationVector().multiply(3.0);
-        Vec3d teleportPos = player.getPos().add(lookVec);
+        Vec3d desiredPos = player.getPos().add(lookVec);
+
+        // Find a safe Y at the target X/Z by scanning down from the top of the world to the first non-air block
+        int tx = (int) Math.floor(desiredPos.x);
+        int tz = (int) Math.floor(desiredPos.z);
+        int topY = world.getTopY();
+        BlockPos topPos = new BlockPos(tx, topY - 1, tz);
+        BlockPos ground = topPos;
+        while (ground.getY() > 0 && world.isAir(ground.down())) {
+            ground = ground.down();
+        }
+        double safeY = ground.getY() + 1.0;
+        Vec3d teleportPos = new Vec3d(desiredPos.x, safeY, desiredPos.z);
 
         world.spawnParticles(
                 ParticleTypes.PORTAL,

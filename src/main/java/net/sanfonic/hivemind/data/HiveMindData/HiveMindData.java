@@ -149,8 +149,8 @@ public class HiveMindData {
         MinecraftServer server = player.getServer();
         if (server == null) return List.of();
 
-        HiveMindDataManager dataManager = HiveMindDataManager.getInstance(server);
-        return dataManager.getOwnerDrones(player.getUuid());
+        HiveMindLinkManager linkManager = HiveMindLinkManager.getInstance(server);
+        return linkManager.getOwnerDrones(player.getUuid());
     }
 
     /**
