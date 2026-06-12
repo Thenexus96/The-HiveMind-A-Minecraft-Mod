@@ -1,0 +1,41 @@
+name: Gitea CI
+
+on:
+  push:
+    branches: [ main, creation, '**' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    container:
+      image: gradle:8.3-jdk17
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ensure gradlew is executable
+        run: |
+          if [ -f ./gradlew ]; then chmod +x ./gradlew; fi
+
+      - name: Build (with warnings)
+        run: |
+          ./gradlew build --no-daemon --console=plain --warning-mode all
+
+      - name: Archive reports
+        run: |
+          mkdir -p build_artifacts
+          if [ -d build/reports/problems ]; then cp -r build/reports/problems build_artifacts/ || true; fi
+          if [ -d build/reports/tests ]; then cp -r build/reports/tests build_artifacts/ || true; fi
+          if [ -d build/libs ]; then cp -r build/libs build_artifacts/ || true; fi
+          ls -la build_artifacts || true
+
+      - name: Create zip of artifacts
+        run: |
+          if command -v zip >/dev/null 2>&1; then zip -r build_artifacts.zip build_artifacts || true; else tar -czf build_artifacts.tar.gz build_artifacts || true; fi
+
+      - name: Workflow output
+        run: |
+          echo "CI completed. Artifacts archived to build_artifacts.zip or build_artifacts.tar.gz"

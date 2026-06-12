@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.sanfonic.hivemind.Hivemind;
+import net.sanfonic.hivemind.data.DroneData.DroneTelemetryStore;
 import net.sanfonic.hivemind.entity.DroneEntity;
 
 import java.util.ArrayList;

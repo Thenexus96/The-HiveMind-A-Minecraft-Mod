@@ -14,7 +14,11 @@ import net.minecraft.world.World;
 
 import java.util.*;
 
+@Deprecated
 public class HiveMindDataManager extends PersistentState{
+    // Deprecated: This facade remains for backward compatibility only. New code should use
+    // HiveMindLinkManager and DroneTelemetryStore directly. This class will be removed in a
+    // future release.
     private static final String DATA_NAME = "hivemind_data";
 
     // Deprecated: keep a tiny facade to avoid breaking older code. Prefer new managers.
@@ -24,7 +28,7 @@ public class HiveMindDataManager extends PersistentState{
         PersistentStateManager persistentStateManager = overworld.getPersistentStateManager();
 
         return persistentStateManager.getOrCreate(
-                HiveMindDataManager::new,
+                HiveMindDataManager::createFromNbt,
                 HiveMindDataManager::new,
                 DATA_NAME
         );

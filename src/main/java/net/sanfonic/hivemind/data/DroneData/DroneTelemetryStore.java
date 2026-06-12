@@ -1,4 +1,4 @@
-package net.sanfonic.hivemind.data.HiveMindData;
+package net.sanfonic.hivemind.data.DroneData;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;

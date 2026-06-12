@@ -23,7 +23,9 @@ import net.minecraft.world.World;
 import net.sanfonic.hivemind.client.DroneClientHandler;
 import net.sanfonic.hivemind.config.ModConfig;
 import net.sanfonic.hivemind.data.HiveMindData.HiveCodeManager;
-import net.sanfonic.hivemind.data.HiveMindData.HiveMindDataManager;
+import net.sanfonic.hivemind.data.HiveMindData.HiveMindLinkManager;
+import net.sanfonic.hivemind.data.DroneData.DroneTelemetryStore;
+// Deprecated: HiveMindDataManager kept as a facade; prefer new managers
 import net.sanfonic.hivemind.entity.custom.goal.FollowHiveMindPlayerGoal;
 import net.sanfonic.hivemind.entity.custom.role.DroneRole;
 import net.sanfonic.hivemind.entity.custom.role.DroneRoleBehavior;
@@ -518,21 +520,24 @@ public class DroneEntity extends PathAwareEntity {
         if (!this.getWorld().isClient) {
             MinecraftServer server = this.getWorld().getServer();
             if (server != null) {
-                HiveMindDataManager dataManager = HiveMindDataManager.getInstance(server);
-                if (dataManager != null) {
-                    dataManager.linkDroneToOwner(this.getUuid(), ownerUUID);
+                HiveMindLinkManager linkManager = HiveMindLinkManager.getInstance(server);
+                if (linkManager != null) {
+                    linkManager.linkDroneToOwner(this.getUuid(), ownerUUID);
 
                     String dimensionKey = this.getWorld().getRegistryKey().getValue().toString();
-                    dataManager.updateDroneData(
-                            this.getUuid(),
-                            ownerUUID,
-                            this.getX(),
-                            this.getY(),
-                            this.getZ(),
-                            dimensionKey,
-                            this.getHealth(),
-                            this.getMaxHealth()
-                    );
+                    DroneTelemetryStore telemetry = DroneTelemetryStore.getInstance(server);
+                    if (telemetry != null) {
+                        telemetry.updateDroneData(
+                                this.getUuid(),
+                                ownerUUID,
+                                this.getX(),
+                                this.getY(),
+                                this.getZ(),
+                                dimensionKey,
+                                this.getHealth(),
+                                this.getMaxHealth()
+                        );
+                    }
                 }
 
                 //New: Generate and assign HiveCode
