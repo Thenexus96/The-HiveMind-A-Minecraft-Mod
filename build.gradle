@@ -59,6 +59,41 @@ java {
 	targetCompatibility = JavaVersion.VERSION_17
 }
 
+// Integration test source set (disabled by default; requires Fabric test runtime)
+sourceSets {
+    integrationTest {
+        java.srcDir file('src/integrationTest/java')
+        resources.srcDir file('src/integrationTest/resources')
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+dependencies {
+    // Integration tests typically require Fabric test libraries. Do NOT add them automatically here;
+    // Instead, uncomment and add the appropriate artifacts when you run integration tests in a dev environment.
+    // Example (commented):
+    // integrationTestImplementation 'net.fabricmc:fabric-junit:1.0.0'
+}
+
+// Task to run integration tests (manual)
+tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests against a running Minecraft server or Fabric test harness.'
+    group = 'verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
+    // Disabled by default in CI; set -DintegrationTest=true to run locally
+    onlyIf { project.hasProperty('integrationTest') }
+}
+
+// Do not wire integrationTest into check by default - run explicitly
+// check.dependsOn integrationTest // Uncomment to include integration tests in the main check lifecycle
+
+
 // Configure tests to use JUnit Jupiter
 tasks.test {
     useJUnitPlatform()
