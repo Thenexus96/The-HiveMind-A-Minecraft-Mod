@@ -17,6 +17,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.sanfonic.hivemind.Hivemind;
 import net.sanfonic.hivemind.entity.DroneEntity;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class HiveMindCommands {
 
     private static void debugLog(String message) {
         if (DEBUG_ENABLED) {
-            System.out.println("[DEBUG] " + message);
+            Hivemind.LOGGER.debug(message);
         }
     }
 

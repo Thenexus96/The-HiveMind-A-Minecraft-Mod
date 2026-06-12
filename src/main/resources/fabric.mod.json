@@ -3,11 +3,11 @@
 	"id": "hivemind",
 	"version": "${version}",
 	"name": "The Hivemind",
-	"description": "This is a Mod for my testing... The True HiveMind will be revealed later!",
+	"description": "Control autonomous drone entities through a neural HiveMind network.",
 	"authors": ["Sanfonic1!"],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/Thenexus96/The-Hive-Mind-A-Minecraft-Mod-Template"
+		"sources": "https://github.com/Thenexus96/The-HiveMind-A-Minecraft-Mod"
 	},
 	"license": "MIT",
 	"environment": "*",
@@ -27,7 +27,7 @@
       "hivemind.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.14.21",
+		"fabricloader": ">=0.16.14",
 		"minecraft": "~1.20.1",
 		"java": ">=17",
 		"fabric-api": "*"

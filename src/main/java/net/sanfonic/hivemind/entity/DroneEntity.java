@@ -86,10 +86,9 @@ public class DroneEntity extends PathAwareEntity {
     // Constructor
     public DroneEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
-        System.out.println("DroneEntity created");
+        log.debug("DroneEntity created");
     }
 
-    //FIXED: Method name matches what's called in ModEntites
     public static DefaultAttributeContainer.Builder createAttributes() {
         return MobEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 40.0)
@@ -98,49 +97,11 @@ public class DroneEntity extends PathAwareEntity {
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16.0); // Added for better AI
     }
 
-    // Method to set the hivemind owner (called by the command)
+    /**
+     * Compatibility alias for older callers. Use {@link #setHiveMindOwner(UUID)} for new code.
+     */
     public void setHiveMindOwnerUuid(UUID ownerUUID) {
-        if (ownerUUID == null) {
-            throw new IllegalArgumentException("Owner UUID cannot be null");
-        }
-
-        this.hiveMindOwnerUuid = ownerUUID;
-
-        if (!this.getWorld().isClient) {
-            MinecraftServer server = this.getWorld().getServer();
-            if (server != null) {
-                HiveMindDataManager dataManager = HiveMindDataManager.getInstance(server);
-                if (dataManager != null) {
-                    dataManager.linkDroneToOwner(this.getUuid(), ownerUUID);
-
-                    String dimensionKey = this.getWorld().getRegistryKey().getValue().toString();
-                    dataManager.updateDroneData(
-                            this.getUuid(),
-                            ownerUUID,
-                            this.getX(),
-                            this.getY(),
-                            this.getZ(),
-                            dimensionKey,
-                            this.getHealth(),
-                            this.getMaxHealth()
-                    );
-                }
-
-                // NEW: Generate and assign HiveCode
-                HiveCodeManager codeManager = HiveCodeManager.getInstance(server);
-                if (codeManager != null) {
-                    this.hiveCode = codeManager.generateHiveCode(this.getUuid(), ownerUUID);
-                    this.dataTracker.set(HIVE_CODE, this.hiveCode);
-                    ModConfig.getInstance().droneLinkDebugLog(
-                            "Assigned HiveCode " + this.hiveCode + " to drone"
-                    );
-                }
-            }
-
-            // Update tracked data after linking
-            PlayerEntity owner = this.getWorld().getPlayerByUuid(ownerUUID);
-            updateTrackedData(owner);
-        }
+        setHiveMindOwner(ownerUUID);
     }
 
     // Method to check if this drone has a hivemind owner
@@ -240,24 +201,24 @@ public class DroneEntity extends PathAwareEntity {
     public void restoreHiveMindConnection() {
         if (this.getWorld().isClient) return; // Only run on server
 
-        System.out.println("[HiveMind] Attempting to restore connection for drones: " + this.getUuid());
+        log.debug("Attempting to restore connection for drone: {}", this.getUuid());
 
         MinecraftServer server = this.getWorld().getServer();
         if (server == null) {
-            System.out.println("[HiveMind] x Server is null, cannot restore");
+            log.warn("Server is null, cannot restore drone connection");
             return;
         }
 
         HiveMindDataManager dataManager = HiveMindDataManager.getInstance(server);
         if (dataManager == null) {
-            System.out.println("[HiveMind] x DataManager is null, cannot restore");
+            log.warn("HiveMindDataManager is null, cannot restore drone connection");
             return;
         }
 
         UUID ownerUUID = dataManager.getDroneOwner(this.getUuid());
 
         if (ownerUUID != null) {
-            System.out.println("[HiveMind] Found owner UUID: " + ownerUUID);
+            log.debug("Found owner UUID: {}", ownerUUID);
 
             // Set the owner UUID
             this.hiveMindOwnerUuid = ownerUUID;
@@ -280,44 +241,44 @@ public class DroneEntity extends PathAwareEntity {
             if (codeManager != null) {
                 this.hiveCode = codeManager.getHiveCode(this.getUuid());
                 if (this.hiveCode != null) {
-                    System.out.println("[HiveMind] Restored HiveCode: " + this.hiveCode);
+                    log.debug("Restored HiveCode: {}", this.hiveCode);
                     this.dataTracker.set(HIVE_CODE, this.hiveCode);
                 } else {
-                    System.out.println("[HiveMind] x HiveCode not found, generating new one");
+                    log.debug("HiveCode not found, generating new one");
                     // If no HiveCode exists, generate one
                     this.hiveCode = codeManager.generateHiveCode(this.getUuid(), ownerUUID);
                     this.dataTracker.set(HIVE_CODE, this.hiveCode);
                 }
             } else {
-                System.out.println("[HiveMind] x HiveCodeManager is null");
+                log.warn("HiveCodeManager is null");
             }
 
             // Update tracked data - try to get player name from server
             PlayerEntity owner = this.getWorld().getPlayerByUuid(ownerUUID);
             if (owner != null) {
-                System.out.println("[HiveMind] Found owner player: " + owner.getName().getString());
+                log.debug("Found owner player: {}", owner.getName().getString());
                 updateTrackedData(owner);
             } else {
                 // Owner is offline - get their name from player data
-                System.out.println("[HiveMind] Owner is offline, trying to get name from player cache");
+                log.debug("Owner is offline, trying player cache");
                 String ownerName = getPlayerNameFromUUID(server, ownerUUID);
                 if (ownerName != null) {
                     this.dataTracker.set(IS_LINKED, true);
                     this.dataTracker.set(OWNER_NAME, ownerName);
-                    System.out.println("[HiveMind] Set owner name from cache: " + ownerName);
+                    log.debug("Set owner name from cache: {}", ownerName);
                 } else {
                     // Fallback to "Unknown Owner"
                     this.dataTracker.set(IS_LINKED, true);
                     this.dataTracker.set(OWNER_NAME, "Unknown Owner");
-                    System.out.println("[HiveMind] Could not find owner name, using Unknown Owner");
+                    log.debug("Could not find owner name, using Unknown Owner");
                 }
 
                 // Owner is offline, but we can still set the tracked data
                 this.dataTracker.set(IS_LINKED, true);
             }
-            System.out.println("[HiveMind] ✓ Successfully restored drone connection");
+            log.debug("Successfully restored drone connection");
         } else {
-            System.out.println("[HiveMind] x No owner found for drone");
+            log.debug("No owner found for drone");
         }
     }
 
@@ -342,7 +303,7 @@ public class DroneEntity extends PathAwareEntity {
             // Fallback - return shortened UUID
             return "Player-" + playerUUID.toString().substring(0, 8);
         } catch (Exception e) {
-            System.out.println("[HiveMind] Error getting player name: " + e.getMessage());
+            log.warn("Error getting player name", e);
             return null;
         }
     }
@@ -388,7 +349,7 @@ public class DroneEntity extends PathAwareEntity {
         if (owner != null) {
             this.dataTracker.set(IS_LINKED, true);
             this.dataTracker.set(OWNER_NAME, owner.getName().getString());
-            System.out.println("[HiveMind] Updated tracked data for owner: " + owner.getName().getString());
+            log.debug("Updated tracked data for owner: {}", owner.getName().getString());
         } else if (this.hiveMindOwnerUuid != null) {
             // Owner is offline but drone is still linked
             this.dataTracker.set(IS_LINKED, true);
@@ -397,13 +358,13 @@ public class DroneEntity extends PathAwareEntity {
             if (!this.getWorld().isClient && this.getWorld().getServer() != null) {
                 String ownerName = getPlayerNameFromUUID(this.getWorld().getServer(), this.hiveMindOwnerUuid);
                 if (ownerName != null) {
-                    this.dataTracker.set(OWNER_NAME, "Offline Owner");
-                    System.out.println("[HiveMind] Updated tracked data for offline owner");
+                    this.dataTracker.set(OWNER_NAME, ownerName);
+                    log.debug("Updated tracked data for offline owner");
                 }
             } else {
                 this.dataTracker.set(IS_LINKED, false);
                 this.dataTracker.set(OWNER_NAME, "");
-                System.out.println("[HiveMind] Cleared tracked data");
+                log.debug("Cleared tracked data");
             }
         }
     }
@@ -444,9 +405,8 @@ public class DroneEntity extends PathAwareEntity {
 
         // Debug log
         if (!this.getWorld().isClient) {
-            System.out.println("[HiveMind] Drone " + getHiveCode() +
-                    " role changed from " + oldRole.getDisplayName() +
-                    " to " + newRole.getDisplayName());
+            log.debug("Drone {} role changed from {} to {}",
+                    getHiveCode(), oldRole.getDisplayName(), newRole.getDisplayName());
         }
     }
 
@@ -558,7 +518,7 @@ public class DroneEntity extends PathAwareEntity {
                 if (dataManager != null) {
                     dataManager.linkDroneToOwner(this.getUuid(), ownerUUID);
 
-                    String dimensionKey = this.getWorld().getRegistryKey().getValue().toTranslationKey();
+                    String dimensionKey = this.getWorld().getRegistryKey().getValue().toString();
                     dataManager.updateDroneData(
                             this.getUuid(),
                             ownerUUID,
@@ -764,15 +724,16 @@ public class DroneEntity extends PathAwareEntity {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
 
-        System.out.println("[HiveMind] DroneEntity reading from NBT...");
+        log.debug("DroneEntity reading from NBT");
 
         if (nbt.containsUuid("HiveMindOwner")) {
             UUID loadedUuid = nbt.getUuid("HiveMindOwner");
             if (isValidUUID(loadedUuid)) {
-                System.out.println("[HiveMind] Loaded owner UUID from NBT:" + loadedUuid);
+                this.hiveMindOwnerUuid = loadedUuid;
+                log.debug("Loaded owner UUID from NBT: {}", loadedUuid);
 
                 // Restore connection immediately when NBT is loaded
-                if (!this.getWorld().isClient) {
+                if (!this.getWorld().isClient && this.getWorld().getServer() != null) {
                     // Schedule restoration for next tick to ensure server is ready
                     this.getWorld().getServer().execute(() -> {
                         restoreHiveMindConnection();
@@ -792,7 +753,7 @@ public class DroneEntity extends PathAwareEntity {
         if (nbt.contains("HiveCode")) {
             this.hiveCode = nbt.getString("HiveCode");
             this.dataTracker.set(HIVE_CODE, this.hiveCode);
-            System.out.println("[HiveMind] Loaded HiveCode from NBT: " + this.hiveCode);
+            log.debug("Loaded HiveCode from NBT: {}", this.hiveCode);
         }
     }
 

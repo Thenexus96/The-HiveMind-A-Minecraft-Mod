@@ -3,6 +3,7 @@ package net.sanfonic.hivemind.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import net.sanfonic.hivemind.Hivemind;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -72,15 +73,14 @@ public class ModConfig {
                         this.debugSpawnRadius = loaded.debugSpawnRadius;
                     }
                 }
-                System.out.println("[HiveMind] Config loaded from " + configPath);
+                Hivemind.LOGGER.info("Config loaded from {}", configPath);
             } else {
                 // Create default config file
                 save();
-                System.out.println("[HiveMind] Created default config at " + configPath);
+                Hivemind.LOGGER.info("Created default config at {}", configPath);
             }
         } catch (Exception e) {
-            System.err.println("[HiveMind] Failed to load config: " + e.getMessage());
-            e.printStackTrace();
+            Hivemind.LOGGER.error("Failed to load config", e);
         }
     }
 
@@ -90,36 +90,35 @@ public class ModConfig {
             try (Writer writer = Files.newBufferedWriter(configPath)) {
                 GSON.toJson(this, writer);
             }
-            System.out.println("[HiveMind] Config saved to " + configPath);
+            Hivemind.LOGGER.info("Config saved to {}", configPath);
         } catch (Exception e) {
-            System.err.println("[HiveMind] Failed to save config: " + e.getMessage());
-            e.printStackTrace();
+            Hivemind.LOGGER.error("Failed to save config", e);
         }
     }
 
     // Existing convenience methods
     public void debugLog(String message) {
         if (enableDebugLogging) {
-            System.out.println("[HiveMind DEBUG] " + message);
+            Hivemind.LOGGER.debug(message);
         }
     }
 
     public void droneLinkDebugLog(String message) {
         if (enableDroneLinkingDebug) {
-            System.out.println("[HiveMind DRONE] " + message);
+            Hivemind.LOGGER.debug("[Drone] {}", message);
         }
     }
 
     public void commandDebugLog(String message) {
         if (enableCommandDebug) {
-            System.out.println("[HiveMind CMD] " + message);
+            Hivemind.LOGGER.debug("[Command] {}", message);
         }
     }
 
     // NEW: Debug-specific logging
     public void debugModeLog(String message) {
         if (debugModeEnabled && enableDebugLogging) {
-            System.out.println("[HiveMind DEBUG MODE] " + message);
+            Hivemind.LOGGER.debug("[Debug Mode] {}", message);
         }
     }
 
