@@ -14,6 +14,7 @@ import net.sanfonic.hivemind.config.ModConfig;
 import net.sanfonic.hivemind.entity.DroneEntity;
 import net.sanfonic.hivemind.entity.ModEntities;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class DebugNetworkHandler {
@@ -144,8 +145,7 @@ public class DebugNetworkHandler {
                         player.getBoundingBox().expand(100),
                         drone -> true
                 ).stream()
-                .min((d1, d2) ->
-                        Double.compare(player.distanceTo(d1), player.distanceTo(d2)))
+                .min(Comparator.comparingDouble(player::distanceTo))
                 .orElse(null);
 
         if (nearestDrone == null) {
