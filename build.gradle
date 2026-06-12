@@ -36,8 +36,8 @@ dependencies {
 	
 	// Testing
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
-		// Mockito for unit tests that mock Minecraft/server behavior
-		testImplementation 'org.mockito:mockito-core:5.3.1'
+		// Mockito inline to allow mocking final classes (PersistentState subclasses)
+		testImplementation 'org.mockito:mockito-inline:4.11.0'
 }
 
 processResources {
