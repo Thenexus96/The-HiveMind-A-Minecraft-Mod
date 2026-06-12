@@ -73,4 +73,4 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 
 ---
 
-**Status:** Active Development | **Version:** 0.2.0-alpha | **Minecraft:** 1.20.1
+**Status:** Active Development | **Version:** 0.2.0-alpha+1.20.1 | **Minecraft:** 1.20.1

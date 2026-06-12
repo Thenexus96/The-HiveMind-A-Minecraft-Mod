@@ -1,4 +1,4 @@
-package net.sanfonic.hivemind.client.debug;
+package net.sanfonic.hivemind.network;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
@@ -14,47 +14,32 @@ import net.sanfonic.hivemind.config.ModConfig;
 import net.sanfonic.hivemind.entity.DroneEntity;
 import net.sanfonic.hivemind.entity.ModEntities;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class DebugNetworkHandler {
 
     public static void register() {
-        // Register debug spawn packet handler
-        ServerPlayNetworking.registerGlobalReceiver(DebugKeyBindings.DEBUG_SPAWN_PACKET,
-                (server, player,
-                 handler, buf, responseSender) -> {
+        ServerPlayNetworking.registerGlobalReceiver(DebugNetworkConstants.DEBUG_SPAWN_PACKET,
+                (server, player, handler, buf, responseSender) -> {
                     int count = buf.readInt();
-
-                    server.execute(() -> {
-                        handleDebugSpawn(player, count);
-                    });
+                    server.execute(() -> handleDebugSpawn(player, count));
                 });
 
-        // Register debug kill nearby packet handler
-        ServerPlayNetworking.registerGlobalReceiver(DebugKeyBindings.DEBUG_KILL_NEARBY_PACKET,
-                (server, player,
-                 handler, buf, responseSender) -> {
+        ServerPlayNetworking.registerGlobalReceiver(DebugNetworkConstants.DEBUG_KILL_NEARBY_PACKET,
+                (server, player, handler, buf, responseSender) -> {
                     int radius = buf.readInt();
-
-                    server.execute(() -> {
-                        handleDebugKillNearby(player, radius);
-                    });
+                    server.execute(() -> handleDebugKillNearby(player, radius));
                 });
 
-        // Register debug teleport packet handler
-        ServerPlayNetworking.registerGlobalReceiver(DebugKeyBindings.DEBUG_TELEPORT_PACKET,
-                (server, player,
-                 handler, buf, responseSender) -> {
-                    server.execute(() -> {
-                        handleDebugTeleport(player);
-                    });
-                });
+        ServerPlayNetworking.registerGlobalReceiver(DebugNetworkConstants.DEBUG_TELEPORT_PACKET,
+                (server, player, handler, buf, responseSender) ->
+                        server.execute(() -> handleDebugTeleport(player)));
     }
 
     private static void handleDebugSpawn(ServerPlayerEntity player, int count) {
         ModConfig config = ModConfig.getInstance();
 
-        // Verify debug mode is enabled
         if (!config.isDebugModeEnabled()) {
             player.sendMessage(Text.literal("§cDebug mode is not enabled!"), false);
             return;
@@ -66,7 +51,6 @@ public class DebugNetworkHandler {
         int spawned = 0;
 
         for (int i = 0; i < count; i++) {
-            // Calculate spawn position in a circle around player
             double angle = (i / (double) count) * Math.PI * 2;
             double offsetX = Math.cos(angle) * radius;
             double offsetZ = Math.sin(angle) * radius;
@@ -77,12 +61,10 @@ public class DebugNetworkHandler {
                     (int) (playerPos.z + offsetZ)
             );
 
-            // Find safe spawn location
             while (!world.isAir(spawnPos) && spawnPos.getY() < world.getTopY()) {
                 spawnPos = spawnPos.up();
             }
 
-            // Create drone
             DroneEntity drone = ModEntities.DRONE.create(world);
             if (drone != null) {
                 drone.refreshPositionAndAngles(
@@ -93,15 +75,13 @@ public class DebugNetworkHandler {
                         0.0F
                 );
 
-                // Auto-link if enabled
                 if (config.shouldAutoLink()) {
-                    drone.setHiveMindOwnerUuid(player.getUuid());
+                    drone.setHiveMindOwner(player.getUuid());
                 }
 
                 world.spawnEntity(drone);
                 spawned++;
 
-                // Spawn particles
                 world.spawnParticles(
                         ParticleTypes.ELECTRIC_SPARK,
                         spawnPos.getX() + 0.5,
@@ -112,7 +92,6 @@ public class DebugNetworkHandler {
             }
         }
 
-        // Play sound
         world.playSound(null, player.getBlockPos(),
                 SoundEvents.BLOCK_BEACON_POWER_SELECT,
                 SoundCategory.PLAYERS, 1.0F, 1.2F);
@@ -138,7 +117,6 @@ public class DebugNetworkHandler {
 
         int killed = 0;
         for (DroneEntity drone : drones) {
-            // Spawn death particles
             world.spawnParticles(
                     ParticleTypes.POOF,
                     drone.getX(), drone.getY() + 1, drone.getZ(),
@@ -162,14 +140,12 @@ public class DebugNetworkHandler {
 
         ServerWorld world = player.getServerWorld();
 
-        // Find nearest drone
         DroneEntity nearestDrone = world.getEntitiesByClass(
                         DroneEntity.class,
                         player.getBoundingBox().expand(100),
                         drone -> true
                 ).stream()
-                .min((d1, d2) ->
-                        Double.compare(player.distanceTo(d1), player.distanceTo(d2)))
+                .min(Comparator.comparingDouble(player::distanceTo))
                 .orElse(null);
 
         if (nearestDrone == null) {
@@ -177,34 +153,28 @@ public class DebugNetworkHandler {
             return;
         }
 
-        // Get position in front of player
         Vec3d lookVec = player.getRotationVector().multiply(3.0);
         Vec3d teleportPos = player.getPos().add(lookVec);
 
-        // Spawn particles at old position
         world.spawnParticles(
                 ParticleTypes.PORTAL,
                 nearestDrone.getX(), nearestDrone.getY() + 1, nearestDrone.getZ(),
                 30, 0.5, 0.5, 0.5, 0.5
         );
 
-        // Teleport
         nearestDrone.teleport(teleportPos.x, teleportPos.y, teleportPos.z);
         nearestDrone.setVelocity(0, 0, 0);
         nearestDrone.velocityDirty = true;
 
-        // Force entity tracker update
         world.getChunkManager().sendToNearbyPlayers(nearestDrone,
                 new net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket(nearestDrone));
 
-        // Spawn particles at new position
         world.spawnParticles(
                 ParticleTypes.PORTAL,
                 teleportPos.x, teleportPos.y + 1, teleportPos.z,
                 30, 0.5, 0.5, 0.5, 0.5
         );
 
-        // Play sound
         world.playSound(null, nearestDrone.getBlockPos(),
                 SoundEvents.ENTITY_ENDERMAN_TELEPORT,
                 SoundCategory.NEUTRAL, 1.0F, 1.0F);

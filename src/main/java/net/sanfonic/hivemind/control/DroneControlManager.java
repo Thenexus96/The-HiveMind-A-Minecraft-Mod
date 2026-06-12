@@ -37,6 +37,10 @@ public class DroneControlManager {
             return false;
         }
 
+        if (!canPlayerControlDrone(player, drone)) {
+            return false;
+        }
+
         // Check if drone is already controlled
         if (isDroneControlled(drone)) {
             return false;
@@ -171,6 +175,13 @@ public class DroneControlManager {
     public static boolean isDroneControlled(DroneEntity drone) {
         return activeSessions.values().stream()
                 .anyMatch(session -> session.getDrone().equals(drone));
+    }
+
+    public static boolean canPlayerControlDrone(ServerPlayerEntity player, DroneEntity drone) {
+        return player != null
+                && drone != null
+                && drone.hasHiveMindOwner()
+                && player.getUuid().equals(drone.getHiveMindOwnerUuid());
     }
 
     public static DroneEntity getControlledDrone(ServerPlayerEntity player) {

@@ -26,6 +26,6 @@ public class HivemindClient implements ClientModInitializer {
         DroneDebugOverlay.register();
         DebugKeyBindings.register();
 
-        System.out.println("HiveMind client initialized"); // Debug message
+        Hivemind.LOGGER.info("HiveMind client initialized");
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.sanfonic.hivemind.Hivemind;
 import net.sanfonic.hivemind.entity.DroneEntity;
 import net.sanfonic.hivemind.network.NetworkHandler;
 import net.sanfonic.hivemind.network.packets.DroneControlPacket;
@@ -41,7 +42,7 @@ public class DroneClientHandler implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        System.out.println("DroneClientHandler initializing...");
+        Hivemind.LOGGER.debug("DroneClientHandler initializing");
 
         // Register client networking receivers
         registerNetworkHandlers();
@@ -53,7 +54,7 @@ public class DroneClientHandler implements ClientModInitializer {
             }
         });
 
-        System.out.println("DroneClientHandler initialized");
+        Hivemind.LOGGER.debug("DroneClientHandler initialized");
     }
 
         private static void registerNetworkHandlers() {
@@ -87,7 +88,7 @@ public class DroneClientHandler implements ClientModInitializer {
     }
 
     private static void startControllingDrone(MinecraftClient client, DroneEntity drone) {
-        System.out.println("Starting drone control for drone ID: " + drone.getId());
+        Hivemind.LOGGER.debug("Starting drone control for drone ID: {}", drone.getId());
 
         // Set control state
         isControllingDrone = true;
@@ -132,7 +133,7 @@ public class DroneClientHandler implements ClientModInitializer {
     }
 
     private static void stopControllingDrone(MinecraftClient client) {
-        System.out.println("Stopping drone control");
+        Hivemind.LOGGER.debug("Stopping drone control");
 
         if (controlledDrone != null) {
             controlledDrone.clearControllingPlayer();
@@ -225,10 +226,12 @@ public class DroneClientHandler implements ClientModInitializer {
 
             // Debug output
             if (player.age % 60 == 0 && (hasActiveInput || rotationChanged)) {
-                System.out.println("Drone Input - Movement: F=" + String.format("%.1f", forward) +
-                        " S=" + String.format("%.1f", strafe) + " U=" + String.format("%.1f", up) +
-                        " Rotation: Y=" + String.format("%.1f", currentYaw) +
-                        " P=" + String.format("%.1f", currentPitch));
+                Hivemind.LOGGER.debug("Drone input movement F={} S={} U={} rotation Y={} P={}",
+                        String.format("%.1f", forward),
+                        String.format("%.1f", strafe),
+                        String.format("%.1f", up),
+                        String.format("%.1f", currentYaw),
+                        String.format("%.1f", currentPitch));
             }
         }
     }
@@ -268,7 +271,7 @@ public class DroneClientHandler implements ClientModInitializer {
 
     // User feedback methods
     private static void onDroneControlStart() {
-        System.out.println("Started controlling drone: " + controlledDroneId);
+        Hivemind.LOGGER.debug("Started controlling drone: {}", controlledDroneId);
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
@@ -277,7 +280,7 @@ public class DroneClientHandler implements ClientModInitializer {
     }
 
     private static void onDroneControlEnd() {
-        System.out.println("Stopped controlling drone");
+        Hivemind.LOGGER.debug("Stopped controlling drone");
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
@@ -307,6 +310,6 @@ public class DroneClientHandler implements ClientModInitializer {
     public static void init() {
         // This method can be called from your main mod initializer if needed
         // The actual initialization happens in onInitializeClient()
-        System.out.println("DroneClientHandler.init() called - initialization will happen on onInitializeClient()");
+        Hivemind.LOGGER.debug("DroneClientHandler.init() called; initialization happens in onInitializeClient()");
     }
 }
