@@ -1,6 +1,9 @@
 plugins {
 	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
+	id 'com.diffplug.spotless' version '6.25.0'
+	id 'checkstyle'
+	id 'com.github.spotbugs' version '6.0.14'
 }
 
 version = project.mod_version
@@ -101,6 +104,65 @@ tasks.register('integrationTest', Test) {
 tasks.test {
     useJUnitPlatform()
 }
+
+// ============================================================================
+// Static Analysis & Code Quality Configuration
+// ============================================================================
+
+// Spotless: Code formatting
+spotless {
+	java {
+		target 'src/*/java/**/*.java'
+
+		// Remove trailing whitespace
+		trimTrailingWhitespace()
+		// Ensure files end with newline
+		endWithNewline()
+
+		// Use Google's Java style guide
+		googleJavaFormat('1.19.1').reflowLongStrings()
+
+		// Additional fixes
+		removeUnusedImports()
+		formatAnnotations()
+	}
+}
+
+// Checkstyle: Code style checking
+checkstyle {
+	toolVersion = '10.12.7'
+	configFile = file('checkstyle.xml')
+	showViolations = true
+	ignoreFailures = false
+}
+
+tasks.withType(Checkstyle).configureEach {
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+// SpotBugs: Bug detection
+spotbugs {
+	ignoreFailures = false
+	reportLevel = 'medium'
+	effort = 'default'
+	excludeFilter = file('spotbugs-exclude.xml')
+}
+
+spotbugsMain {
+	reports {
+		html.required = true
+		xml.required = true
+	}
+}
+
+// Add quality checks to the default build verification
+check.dependsOn spotlessCheck, checkstyleMain, spotbugsMain
+
+// ============================================================================
+
 
 jar {
 	inputs.property "archivesName", project.base.archivesName

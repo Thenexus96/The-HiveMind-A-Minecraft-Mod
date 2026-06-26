@@ -1,0 +1,28 @@
+# Configuration for Dependabot to automate dependency updates
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  # Check for updates to Gradle dependencies
+  - package-ecosystem: 'gradle'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '04:00'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'sanfonic'
+    labels:
+      - 'dependencies'
+      - 'java'
+    commit-message:
+      prefix: 'chore(deps):'
+      prefix-development: 'chore(deps-dev):'
+      include: 'scope'
+    pull-request-branch-name:
+      separator: '/'
+    # Allow automatic merge for patch and minor updates on main
+    auto-merge:
+      enabled: false
+

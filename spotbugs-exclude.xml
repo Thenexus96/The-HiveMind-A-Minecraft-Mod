@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SpotBugs exclude filter for HiveMind
+  This file defines patterns for bugs that are acceptable in this project.
+  Reference: https://spotbugs.readthedocs.io/en/latest/filter.html
+-->
+<FindBugsFilter>
+  <!-- Exclude test classes from SpotBugs analysis -->
+  <Match>
+    <Class name="~.*\..*Test"/>
+  </Match>
+
+  <!-- Exclude integration test classes -->
+  <Match>
+    <Class name="~.*\..*IntegrationTest"/>
+  </Match>
+
+  <!-- Entity classes may have unused fields -->
+  <Match>
+    <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD"/>
+    <Class name="~.*\.entity\..*"/>
+  </Match>
+
+  <!-- Data transfer objects often have unused fields for serialization -->
+  <Match>
+    <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD"/>
+    <Class name="~.*\.dto\..*"/>
+  </Match>
+  <Match>
+    <Bug pattern="UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD"/>
+    <Class name="~.*\.dto\..*"/>
+  </Match>
+
+  <!-- Fabric mod initializers often appear unused -->
+  <Match>
+    <Bug pattern="UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS"/>
+    <Class name="~.*ModInitializer"/>
+  </Match>
+
+  <!-- Callbacks and event handlers may not always be called in same context -->
+  <Match>
+    <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    <Class name="~.*\..*Callback"/>
+  </Match>
+  <Match>
+    <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    <Class name="~.*\..*Handler"/>
+  </Match>
+
+  <!-- Exclude auto-generated or Fabric-specific code -->
+  <Match>
+    <Bug pattern="UNKNOWN"/>
+    <Class name="net.minecraft.*"/>
+  </Match>
+
+  <!-- Allow serialVersionUID to be missing in some cases -->
+  <Match>
+    <Bug pattern="SE_NO_SERIALVERSIONID"/>
+  </Match>
+
+  <!-- Intentional null assignments in some cases -->
+  <Match>
+    <Bug pattern="NP_NULL_ON_SOME_PATH"/>
+    <Method name="cleanup"/>
+  </Match>
+
+  <!-- Intentional equals override for certain cases -->
+  <Match>
+    <Bug pattern="EQ_UNUSUAL_EQUALS_INHERITED_ODDNESS"/>
+  </Match>
+</FindBugsFilter>
+
