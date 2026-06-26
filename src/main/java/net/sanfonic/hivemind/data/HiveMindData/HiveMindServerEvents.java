@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.sanfonic.hivemind.Hivemind;
+import net.sanfonic.hivemind.data.DroneData.DroneTelemetryStore;
 import net.sanfonic.hivemind.entity.DroneEntity;
 
 import java.util.ArrayList;
@@ -75,8 +76,9 @@ public class HiveMindServerEvents {
 
         // Clean up data for non-existent drones
         if (!drones.isEmpty()) {
-            HiveMindDataManager dataManager = HiveMindDataManager.getInstance(server);
+            HiveMindLinkManager linkManager = HiveMindLinkManager.getInstance(server);
             HiveCodeManager codeManager = HiveCodeManager.getInstance(server);
+            DroneTelemetryStore telemetry = DroneTelemetryStore.getInstance(server);
 
             List<UUID> existingDroneUUIDs = new ArrayList<>();
 
@@ -90,7 +92,8 @@ public class HiveMindServerEvents {
             }
 
             Hivemind.LOGGER.debug("Cleaning up data for {} existing drones", existingDroneUUIDs.size());
-            dataManager.cleanupNonExistentDrones(existingDroneUUIDs);
+            if (linkManager != null) linkManager.cleanupNonExistentDrones(existingDroneUUIDs);
+            if (telemetry != null) telemetry.cleanupNonExistentDrones(existingDroneUUIDs);
             codeManager.cleanupInvalidCodes(existingDroneUUIDs);
         }
 

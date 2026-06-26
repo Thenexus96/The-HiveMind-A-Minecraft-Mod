@@ -9,32 +9,42 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-    
-    - name: Validate Gradle wrapper
-      uses: gradle/wrapper-validation-action@v2
-        
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-      
-    - name: Build with Gradle
-      run: ./gradlew build
-      env:
-        JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
-      
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      if: success()
-      with:
-        name: hivemind-mod-${{ github.ref_name }}-${{ github.sha }}
-        path: build/libs/*.jar
-        if-no-files-found: warn
-        retention-days: 30
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v2
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Restore Gradle cache (fallback)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/build.gradle*','**/gradle-wrapper.properties') }}
+
+      - name: Run unit tests
+        run: ./gradlew --no-daemon --console=plain --warning-mode all test
+
+      - name: Build with Gradle
+        run: ./gradlew --no-daemon --console=plain --warning-mode all build --stacktrace
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+        with:
+          name: hivemind-mod-${{ github.ref_name }}-${{ github.sha }}
+          path: build/libs/*.jar
+          if-no-files-found: warn
+          retention-days: 30

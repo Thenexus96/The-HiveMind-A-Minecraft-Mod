@@ -1,0 +1,167 @@
+name: Gitea CI (Primary)
+
+on:
+  push:
+    branches: [ main, creation, testing, pre-release ]
+  pull_request:
+    branches: [ main, creation, testing, pre-release ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    container:
+      image: gradle:8.3-jdk17
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify environment
+        run: |
+          echo "=== Gradle and Java Versions ==="
+          gradle --version
+          java -version
+          echo "=== Available Disk Space ==="
+          df -h
+          echo "=== Environment ==="
+          echo "JAVA_HOME: $JAVA_HOME"
+          echo "GRADLE_USER_HOME: ${GRADLE_USER_HOME:-.gradle}"
+
+      - name: Grant execute permission for gradlew
+        run: |
+          if [ -f ./gradlew ]; then
+            chmod +x ./gradlew
+            ls -la ./gradlew
+          else
+            echo "ERROR: gradlew not found"
+            exit 1
+          fi
+
+      - name: Run unit tests
+        run: |
+          echo "=== Running Unit Tests ==="
+          ./gradlew \
+            --no-daemon \
+            --console=plain \
+            --warning-mode all \
+            test \
+            --info
+          echo "=== Unit Tests Complete ==="
+
+      - name: Check code formatting (Spotless)
+        run: |
+          echo "=== Checking Code Formatting ==="
+          ./gradlew \
+            --no-daemon \
+            --console=plain \
+            spotlessCheck \
+            --info || (echo "Run: ./gradlew spotlessApply to fix" && exit 1)
+          echo "=== Formatting Check Complete ==="
+
+      - name: Check code style (Checkstyle)
+        run: |
+          echo "=== Checking Code Style ==="
+          ./gradlew \
+            --no-daemon \
+            --console=plain \
+            checkstyleMain \
+            --info
+          echo "=== Style Check Complete ==="
+
+      - name: Build project
+        run: |
+          echo "=== Building Project ==="
+          ./gradlew \
+            --no-daemon \
+            --console=plain \
+            --warning-mode all \
+            build \
+            --stacktrace \
+            --info
+          echo "=== Build Complete ==="
+
+      - name: Run integration tests (main branch only)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "=== Running Integration Tests ==="
+          ./gradlew \
+            --no-daemon \
+            --console=plain \
+            --warning-mode all \
+            integrationTest \
+            -PintegrationTest \
+            --stacktrace \
+            --info
+          echo "=== Integration Tests Complete ==="
+
+      - name: Archive test reports and artifacts
+        if: always()
+        run: |
+          echo "=== Archiving Artifacts ==="
+          mkdir -p build_artifacts
+          
+          # Copy test reports
+          if [ -d build/reports/tests ]; then
+            cp -r build/reports/tests build_artifacts/ || true
+            echo "✓ Test reports archived"
+          fi
+          
+          # Copy integration test reports (if they exist)
+          if [ -d build/reports/integrationTest ]; then
+            cp -r build/reports/integrationTest build_artifacts/ || true
+            echo "✓ Integration test reports archived"
+          fi
+          
+          # Copy build libs
+          if [ -d build/libs ]; then
+            cp -r build/libs build_artifacts/ || true
+            echo "✓ Build artifacts archived"
+          fi
+          
+          # Copy Qodana reports if they exist
+          if [ -d .qodana ]; then
+            cp -r .qodana build_artifacts/ || true
+            echo "✓ Qodana reports archived"
+          fi
+          
+          # List all archived items
+          echo "=== Archived Contents ==="
+          find build_artifacts -type f | head -20
+          du -sh build_artifacts
+
+      - name: Create archive for download
+        if: always()
+        run: |
+          echo "=== Creating Archive ==="
+          if command -v tar >/dev/null 2>&1; then
+            tar --exclude='*.lock' -czf build_artifacts.tar.gz build_artifacts 2>/dev/null || true
+            ls -lh build_artifacts.tar.gz 2>/dev/null || echo "tar.gz creation skipped"
+          fi
+          if command -v zip >/dev/null 2>&1; then
+            zip -r -q build_artifacts.zip build_artifacts 2>/dev/null || true
+            ls -lh build_artifacts.zip 2>/dev/null || echo "zip creation skipped"
+          fi
+          echo "=== Archive Complete ==="
+
+      - name: Cleanup gradle cache (optional - removes ~1GB)
+        if: failure()
+        continue-on-error: true
+        run: |
+          echo "Build failed. Cleaning gradle cache for next run..."
+          rm -rf ~/.gradle/caches/fabric-loom || true
+          echo "Cleanup complete"
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo "=== Build Job Summary ==="
+          echo "Build Status: ${{ job.status }}"
+          echo "Timestamp: $(date)"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"
+          if [ -d build_artifacts ]; then
+            echo "Artifacts generated: $(find build_artifacts -type f | wc -l) files"
+          fi
+
