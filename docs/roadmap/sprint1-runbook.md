@@ -1,6 +1,8 @@
 # Sprint 1 — Runbook
 
-Last updated: 2026-07-02
+Last updated: 2026-07-04
+
+**Sprint Progress: 40% Complete (2/5 tasks done)**
 
 This runbook explains how to run Sprint 1 locally and in CI, lists the sprint goals and acceptance criteria, and provides step-by-step developer onboarding commands, config examples, and the PR checklist so contributors can complete work reproducibly.
 
@@ -23,6 +25,44 @@ Acceptance criteria (Definition of Done)
  - Research skeleton: data model (Node, Cost, Effect) exists, server unlock API exists and a sample node (+5% soldier damage) is implemented and tested.
  - Node-claiming prototype: player can claim a node in the world which increases hive resources and writes to persistent Hive data.
  - A PR with all code, tests and docs passes local `spotlessCheck`, `checkstyle`, `spotbugs` and `test` tasks.
+
+## Progress Status
+
+### Completed ✅
+
+1. **Debug Mode** (Task A)
+  - ✅ Implemented `DebugMode` class with toggle and overlay
+  - ✅ HUD overlay shows hovered entity id, role, health, owner, hive id
+  - ✅ Console command `/hivemind_debug` for toggle and dump
+  - ✅ Dump command lists all drones with roles
+  - ✅ 11 unit tests passing
+  - Files: `DebugCommands.java`, `DebugKeyBindings.java`, `DroneDebugOverlay.java`
+
+2. **HiveManager & Per-player Hive** (Task B)
+  - ✅ Implemented `Hive` data structure: owner UUID, members, resources, research state
+  - ✅ Implemented `HiveManager` server-side singleton with world NBT persistence
+  - ✅ `/hive join` command to get or create player's hive
+  - ✅ `/hive leave` command to leave a hive (non-owners only)
+  - ✅ Member management (add/remove)
+  - ✅ Resource management
+  - ✅ 11 unit tests passing (Hive serialization, member ops, resource ops)
+  - Files: `Hive.java`, `HiveManager.java`, `HiveTest.java`
+
+### In Progress 🔄
+
+3. **Progression / Research Skeleton** (Task C)
+  - 🔄 Starting implementation
+  - Need: Node model, Cost model, Effect model, unlock API, sample +5% soldier damage node
+  - Estimated 1 day to complete
+
+### Pending ⏳
+
+4. **Node Claiming & Resource Flow** (Task D)
+  - ⏳ Depends on research skeleton patterns
+  - Need: Node entity/tile, claim mechanic, resource increment
+
+5. **Documentation & Debugging Tools** (Task E)
+  - ⏳ Will update DESIGN_DECISIONS.md and QUICK_START.md at sprint end
 
 Quick onboarding / prerequisites
  - Java 17 SDK installed (recommended: AdoptOpenJDK/Temurin 17).
