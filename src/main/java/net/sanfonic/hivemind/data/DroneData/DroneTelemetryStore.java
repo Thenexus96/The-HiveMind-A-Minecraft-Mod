@@ -46,6 +46,11 @@ public class DroneTelemetryStore extends PersistentState {
 
   public static DroneTelemetryStore getInstance(MinecraftServer server) {
     ServerWorld overworld = server.getWorld(World.OVERWORLD);
+
+    if (overworld == null) {
+      throw new IllegalStateException("Overworld is not loaded; cannot access DroneTelemetryStore");
+    }
+
     PersistentStateManager persistentStateManager = overworld.getPersistentStateManager();
 
     return persistentStateManager.getOrCreate(

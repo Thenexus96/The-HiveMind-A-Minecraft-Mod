@@ -21,6 +21,10 @@ public class HiveMindLinkManager extends PersistentState {
 
   public static HiveMindLinkManager getInstance(MinecraftServer server) {
     ServerWorld overworld = server.getWorld(World.OVERWORLD);
+    if (overworld == null) {
+      throw new IllegalStateException("Overworld is not loaded; cannot access HiveMindLinkManager");
+    }
+
     PersistentStateManager persistentStateManager = overworld.getPersistentStateManager();
 
     return persistentStateManager.getOrCreate(

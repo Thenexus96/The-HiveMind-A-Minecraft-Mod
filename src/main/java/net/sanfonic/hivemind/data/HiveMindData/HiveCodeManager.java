@@ -35,6 +35,11 @@ public class HiveCodeManager extends PersistentState {
   /** Get or create the HiveCodeManager instance */
   public static HiveCodeManager getInstance(MinecraftServer server) {
     ServerWorld overworld = server.getWorld(World.OVERWORLD);
+
+    if (overworld == null) {
+      throw new IllegalStateException("Overworld is not loaded; cannot access HiveCodeManager");
+    }
+
     PersistentStateManager stateManager = overworld.getPersistentStateManager();
 
     return stateManager.getOrCreate(
@@ -206,7 +211,7 @@ public class HiveCodeManager extends PersistentState {
    */
   public boolean isCodeInUseByPlayer(String hiveCode, UUID ownerUUID) {
     UUID codeOwner = codeToOwner.get(hiveCode);
-    return codeOwner != null && codeOwner.equals(hiveCode);
+    return codeOwner != null && codeOwner.equals(ownerUUID);
   }
 
   /**

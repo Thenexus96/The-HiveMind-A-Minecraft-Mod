@@ -7,7 +7,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
+import net.minecraft.world.World;
 import net.sanfonic.hivemind.Hivemind;
 
 /**
@@ -41,8 +43,11 @@ public class HiveManager extends PersistentState {
     if (server == null) {
       return new HiveManager();
     }
-    return server
-        .getWorld(net.minecraft.world.World.OVERWORLD)
+    ServerWorld overworld = server.getWorld(World.OVERWORLD);
+    if (overworld == null) {
+      throw new IllegalStateException("Overworld is not loaded; cannot access HiveManager");
+    }
+    return overworld
         .getPersistentStateManager()
         .getOrCreate(
             nbt -> {

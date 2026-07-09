@@ -6,6 +6,7 @@ import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.sanfonic.hivemind.data.DroneData.DroneTelemetryStore;
 import net.sanfonic.hivemind.data.HiveMindData.HiveCodeManager;
+import net.sanfonic.hivemind.data.HiveMindData.HiveMindData;
 import net.sanfonic.hivemind.data.HiveMindData.HiveMindLinkManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,40 +28,53 @@ public class DroneLinkUtilsTest {
   }
 
   @Test
-  public void testLinkDrone_callsManagersAndReturnsHiveCode() {
-    // Simple concrete test doubles (avoid Mockito due to final Mojang classes)
-    HiveMindLinkManager testLink =
-        new HiveMindLinkManager() {
-          private boolean linked = false;
+  public void testLinkDroneWithService() {
+    HiveMindLinkManager testLink = new HiveMindLinkManager();
 
-          @Override
-          public void linkDroneToOwner(UUID droneUUID, UUID ownerUUID) {
-            linked = true;
-            super.linkDroneToOwner(droneUUID, ownerUUID);
-          }
+    DroneTelemetryStore testStore = new DroneTelemetryStore();
+
+    HiveCodeManager testCodeManager =
+            new HiveCodeManager() {
+              @Override
+              public String generateHiveCode(UUID droneUUID, UUID ownerUUID) {
+                return "D-123";
+              }
+          };
+
+    HiveMindService testService =
+            new HiveMindService() {
+        @Override
+              public HiveMindService getLinkManager(MinecraftServer server) {
+                return testLink;
+              }
+
+              @Override
+                public DroneTelemetryStore getTelemetryStore(MinecraftServer server) {
+            return testStore;
+              }
+
+              @Override
+                public HiveCodeManager getHiveCodeManager(MinecraftServer server) {
+            return testCode;
+              }
         };
 
-    DroneTelemetryStore testTelemetry =
-        new DroneTelemetryStore() {
-          public boolean updated = false;
+    HiveMindServiceManager.setProvider(testService);
 
-          @Override
-          public void updateDroneData(
-              UUID droneUUID,
-              UUID ownerUUID,
-              double x,
-              double y,
-              double z,
-              String dimensionKey,
-              double health,
-              double maxHealth) {
-            this.updated = true;
-            super.updateDroneData(droneUUID, ownerUUID, x, y, z, dimensionKey, health, maxHealth);
-          }
-        };
+    UUID drone =  UUID.randomUUID();
+    UUID owner = UUID.randomUUID();
+
+    String code =
+            DroneLinkUtils.linkDroneWithService(
+                    testService, drone, owner, 1.0, 2.0, 3.0, "overworld",
+                    10.0, 20.0);
+
+    assertEquals("D-123", code);
+    assertTrue(testLink.isDroneLinked(drone));
+    assertNotNull(testStore.getDroneData(drone));
 
     HiveCodeManager testCode =
-        new HiveCodeManager() {
+            new HiveCodeManager() {
           @Override
           public String generateHiveCode(UUID droneUUID, UUID ownerUUID) {
             return "D-123";
@@ -76,7 +90,7 @@ public class DroneLinkUtilsTest {
 
           @Override
           public DroneTelemetryStore getTelemetryStore(MinecraftServer server) {
-            return testTelemetry;
+            return testStore;
           }
 
           @Override
@@ -96,7 +110,7 @@ public class DroneLinkUtilsTest {
 
     assertEquals("D-123", code);
     assertTrue(testLink.isDroneLinked(drone));
-    assertNotNull(testTelemetry.getDroneData(drone));
+    assertNotNull(testStore.getDroneData(drone));
   }
 
   @Test

@@ -38,32 +38,32 @@ and directly possess drones to extend your reach in the Minecraft world.
 ## 📖 Documentation
 
 **Start Here**:
-- [🚀 Quick Start Guide](docs/QUICK_START.md) — Navigation for all docs
-- [✅ Implementation Complete](docs/IMPLEMENTATION_COMPLETE.md) — Summary of all implementations
+- [🚀 Quick Start Guide](documentation/QUICK_START.md) — Navigation for all docs
+- [✅ Implementation Complete](documentation/IMPLEMENTATION_COMPLETE.md) — Summary of all implementations
 
 **Development & CI**:
-- [Gitea CI/CD Guide](docs/GITEA_CI.md) (Primary — Recommended First Read)
-- [Code Quality & Static Analysis](docs/CODE_QUALITY.md)
-- [CI & Developer Workflows](docs/CI.md) (GitHub Actions reference)
+- [Gitea CI/CD Guide](documentation/GITEA_CI.md) (Primary — Recommended First Read)
+- [Code Quality & Static Analysis](documentation/CODE_QUALITY.md)
+- [CI & Developer Workflows](documentation/CI.md) (GitHub Actions reference)
 
 **Release & Versioning**:
-- [Release & Version Management](docs/RELEASE.md)
-- [API Stability & Backward Compatibility](docs/API_STABILITY.md)
+- [Release & Version Management](documentation/RELEASE.md)
+- [API Stability & Backward Compatibility](documentation/API_STABILITY.md)
 
 **Planning & Roadmap**:
-- [Project Roadmap & Feature Planning](docs/ROADMAP.md)
-- [Technical Decision Process](docs/DECISION_PROCESS.md)
+- [Project Roadmap & Feature Planning](documentation/ROADMAP.md)
+- [Technical Decision Process](documentation/DECISION_PROCESS.md)
 
 **Project Docs**:
-- [Player Guide](docs/wiki/Player-Guide.md)
-- [Commands Reference](docs/wiki/Commands.md)
-- [Developer Documentation](docs/wiki/Developer-Guide.md)
-- [API Guide](docs/wiki/API-Documentation.md)
-- [Repository Maintenance](docs/MAINTENANCE.md)
+- [Player Guide](documentation/wiki/Player-Guide.md)
+- [Commands Reference](documentation/wiki/Commands.md)
+- [Developer Documentation](documentation/wiki/Developer-Guide.md)
+- [API Guide](documentation/wiki/API-Documentation.md)
+- [Repository Maintenance](documentation/MAINTENANCE.md)
 
 ## 🗺️ Roadmap
 
-See our [Development Roadmap](docs/roadmap/progress-tracking.md) for current progress and upcoming features.
+See our [Development Roadmap](documentation/roadmap/progress-tracking.md) for current progress and upcoming features.
 
 ### Current Phase: Phase 2 - Drone Framework ✅
 
