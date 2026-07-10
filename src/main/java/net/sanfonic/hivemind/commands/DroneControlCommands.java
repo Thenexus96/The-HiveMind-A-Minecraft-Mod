@@ -46,6 +46,11 @@ public class DroneControlCommands {
                 return 0;
             }
 
+            if (!DroneControlManager.canPlayerControlDrone(player, drone)) {
+                context.getSource().sendError(Text.literal("You can only control drones linked to your HiveMind."));
+                return 0;
+            }
+
             if (DroneControlManager.takeControlOfDrone(player, drone)) {
                 context.getSource().sendFeedback(() -> Text.literal("Taking control of drone!"), false);
                 return 1;
@@ -85,7 +90,8 @@ public class DroneControlCommands {
             java.util.List<DroneEntity> nearbyDrones = player.getWorld()
                     .getEntitiesByClass(DroneEntity.class,
                             player.getBoundingBox().expand(50.0),
-                            drone -> !DroneControlManager.isDroneControlled(drone));
+                            drone -> !DroneControlManager.isDroneControlled(drone)
+                                    && DroneControlManager.canPlayerControlDrone(player, drone));
 
             if (nearbyDrones.isEmpty()) {
                 context.getSource().sendFeedback(() -> Text.literal("No available drones found nearby."), false);
@@ -133,7 +139,8 @@ public class DroneControlCommands {
             DroneEntity nearestDrone = player.getWorld()
                     .getEntitiesByClass(DroneEntity.class,
                             player.getBoundingBox().expand(range),
-                            drone -> !DroneControlManager.isDroneControlled(drone))
+                            drone -> !DroneControlManager.isDroneControlled(drone)
+                                    && DroneControlManager.canPlayerControlDrone(player, drone))
                     .stream()
                     .min((d1, d2) -> Double.compare(player.distanceTo(d1), player.distanceTo(d2)))
                     .orElse(null);

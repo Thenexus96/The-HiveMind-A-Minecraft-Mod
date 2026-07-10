@@ -1,0 +1,128 @@
+name: Gitea CI (Advanced - Optional)
+
+# Use this workflow for advanced scenarios like parallel jobs or heavy datagen
+# To use: rename to ci.yml and remove the old ci.yml
+# Or keep both: this will run alongside the primary ci.yml
+
+on:
+  push:
+    branches: [ main, creation, testing, pre-release ]
+  pull_request:
+    branches: [ main, creation, testing, pre-release ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Job 1: Cache warmup (optional - helps if many runners share cache)
+  cache-warmup:
+    runs-on: self-hosted
+    container:
+      image: gradle:8.3-jdk17
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download dependencies
+        run: |
+          echo "Warming up Gradle cache..."
+          ./gradlew \
+            --no-daemon \
+            --console=plain \
+            dependencies \
+            --configuration runtimeClasspath \
+            > /dev/null 2>&1 || true
+          echo "Cache warmup complete"
+
+  # Job 2: Tests
+  test:
+    runs-on: self-hosted
+    container:
+      image: gradle:8.3-jdk17
+    needs: cache-warmup
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run unit tests
+        run: |
+          echo "=== Running Unit Tests ==="
+          ./gradlew \
+            --no-daemon \
+            --console=plain \
+            --warning-mode all \
+            test \
+            --stacktrace
+
+      - name: Upload test results
+        if: always()
+        run: |
+          mkdir -p test_artifacts
+          if [ -d build/reports/tests ]; then
+            cp -r build/reports/tests test_artifacts/ || true
+          fi
+          echo "Test results archived"
+
+  # Job 3: Build
+  build:
+    runs-on: self-hosted
+    container:
+      image: gradle:8.3-jdk17
+    needs: cache-warmup
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build project
+        run: |
+          echo "=== Building Project ==="
+          ./gradlew \
+            --no-daemon \
+            --console=plain \
+            --warning-mode all \
+            build \
+            --stacktrace \
+            --parallel
+
+      - name: Archive build artifacts
+        if: always()
+        run: |
+          mkdir -p build_artifacts
+          if [ -d build/libs ]; then
+            cp -r build/libs build_artifacts/ || true
+          fi
+          if [ -d build/reports ]; then
+            cp -r build/reports build_artifacts/ || true
+          fi
+          du -sh build_artifacts
+
+  # Job 4: Integration tests (main only)
+  integration-test:
+    runs-on: self-hosted
+    container:
+      image: gradle:8.3-jdk17
+    needs: [ test, build ]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run integration tests
+        run: |
+          echo "=== Running Integration Tests ==="
+          ./gradlew \
+            --no-daemon \
+            --console=plain \
+            --warning-mode all \
+            integrationTest \
+            -PintegrationTest \
+            --stacktrace
+
+      - name: Archive integration test results
+        if: always()
+        run: |
+          mkdir -p test_artifacts
+          if [ -d build/reports/integrationTest ]; then
+            cp -r build/reports/integrationTest test_artifacts/ || true
+          fi
+

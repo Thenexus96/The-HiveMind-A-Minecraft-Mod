@@ -8,6 +8,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
+import net.sanfonic.hivemind.Hivemind;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class HiveCodeManager extends PersistentState {
                 int nextNumber = countersNbt.getInt(key);
                 manager.playerNextDroneNumber.put(ownerUUID, nextNumber);
             } catch (IllegalArgumentException e) {
-                System.err.println("[HiveMind] Invalid UUID in PlayerCounters: " + key);
+                Hivemind.LOGGER.warn("Invalid UUID in PlayerCounters: {}", key);
             }
         }
 
@@ -156,8 +157,8 @@ public class HiveCodeManager extends PersistentState {
         codeToDrone.put(hiveCode, droneUUID);
         codeToOwner.put(hiveCode, ownerUUID);
 
-        System.out.println("[HiveMind] Generated HiveCode " + hiveCode + " for player " +
-                ownerUUID.toString().substring(0, 8) + " (player's drone #" + droneNumber + ")");
+        Hivemind.LOGGER.debug("Generated HiveCode {} for player {} (player's drone #{})",
+                hiveCode, ownerUUID.toString().substring(0, 8), droneNumber);
 
         markDirty();
         return hiveCode;
@@ -221,7 +222,7 @@ public class HiveCodeManager extends PersistentState {
         if (hiveCode != null) {
             codeToDrone.remove(hiveCode);
             codeToOwner.remove(hiveCode);
-            System.out.println("[HiveMind] Removed HiveCode " + hiveCode + " (number not reused)");
+            Hivemind.LOGGER.debug("Removed HiveCode {} (number not reused)", hiveCode);
             markDirty();
         }
     }
@@ -266,7 +267,7 @@ public class HiveCodeManager extends PersistentState {
         codeToOwner.clear();
         for (Map.Entry<UUID, String> entry : droneToCode.entrySet()) {
             codeToDrone.put(entry.getValue(), entry.getKey());
-            // Note: owner mapping will need to be rebuilt from HiveMindDataManager
+            // Note: owner mapping will need to be rebuilt from HiveMindLinkManager
         }
 
         markDirty();

@@ -41,6 +41,15 @@ and directly possess drones to extend your reach in the Minecraft world.
 - [Commands Reference](docs/wiki/Commands.md)
 - [Developer Documentation](docs/wiki/Developer-Guide.md)
 - [API Guide](docs/wiki/API-Documentation.md)
+- [Quick Start Guide](docs/QUICK_START.md)
+- [Gitea CI/CD Guide](docs/GITEA_CI.md) (Primary — Recommended First Read)
+- [Code Quality & Static Analysis](docs/CODE_QUALITY.md)
+- [Release & Version Management](docs/RELEASE.md)
+- [API Stability & Backward Compatibility](docs/API_STABILITY.md)
+- [Project Roadmap & Feature Planning](docs/ROADMAP.md)
+- [Technical Decision Process](docs/DECISION_PROCESS.md)
+- [CI & Developer Workflows](docs/CI.md) (GitHub Actions reference)
+- [Repository Maintenance](docs/MAINTENANCE.md)
 
 ## 🗺️ Roadmap
 
@@ -73,4 +82,4 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 
 ---
 
-**Status:** Active Development | **Version:** 0.2.0-alpha | **Minecraft:** 1.20.1
+**Status:** Active Development | **Version:** 0.2.0-alpha+1.20.1 | **Minecraft:** 1.20.1

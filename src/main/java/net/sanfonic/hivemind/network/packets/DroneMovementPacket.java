@@ -5,9 +5,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.sanfonic.hivemind.control.DroneControlManager;
 import net.sanfonic.hivemind.entity.DroneEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public record DroneMovementPacket(float forward, float strafe, float up, boolean jumping, boolean crouching, float yaw,
                                   float pitch) {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DroneMovementPacket.class);
 
     public static DroneMovementPacket read(PacketByteBuf buf) {
         float forward = buf.readFloat();
@@ -52,7 +55,7 @@ public record DroneMovementPacket(float forward, float strafe, float up, boolean
 
             // Debug movement less frequently
             if (player.getWorld().getTime() % 40 == 0) {
-                System.out.println("Server: Drone movement applied: " + movement);
+                LOGGER.debug("Drone movement applied: {}", movement);
             }
         } else {
             // Stop the drone if no input
@@ -68,9 +71,8 @@ public record DroneMovementPacket(float forward, float strafe, float up, boolean
         if (crouching) {
             drone.triggerSecondaryAbility();
         }
-
-        System.out.println("Server received: Pitch=" + pitch + " Yaw=" + yaw);
-        System.out.println("Drone current: Pitch=" + drone.getPitch() + " Yaw=" + drone.getYaw());
+        LOGGER.trace("Server received drone rotation pitch={} yaw={}; drone current pitch={} yaw={}",
+                pitch, yaw, drone.getPitch(), drone.getYaw());
     }
 
     private Vec3d calculateMovement(DroneEntity drone) {
