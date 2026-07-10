@@ -52,6 +52,26 @@ Or manually:
 
 ---
 
+## Developer Tools — Debug Mode
+
+Use Debug Mode to speed development and inspect hive/drone state in-game. It is implemented as a toggleable HUD and a console command.
+
+Commands / Usage:
+
+```bash
+# Toggle Debug Mode (in-game keybind will be documented in the developer guide)
+# (Example console command)
+/hivemind_debug toggle
+
+# Dump selected entity data to server log
+/hivemind_debug dump
+
+# Use Debug Mode to view: hovered entity id, role, owner, hive id, and basic performance counters
+```
+
+Enable Debug Mode while running an internal test world to visualize node links, entity info, and simple performance metrics (tick time, entity counts).
+
+
 ## Important Paths
 
 | Path | Purpose |

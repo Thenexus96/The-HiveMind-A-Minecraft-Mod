@@ -1,234 +1,206 @@
 package net.sanfonic.hivemind.data.player;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.World;
-import net.sanfonic.hivemind.Hivemind;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.World;
+import net.sanfonic.hivemind.Hivemind;
 
 /**
- * Server-side storage for player HiveMind data with FILE-BASED persistence
- * This is the ONLY way to reliably save player data in Fabric
+ * Server-side storage for player HiveMind data with FILE-BASED persistence This is the ONLY way to
+ * reliably save player data in Fabric
  */
 public class PlayerHiveComponent {
-    // In-memory cache for active players
-    private static final Map<UUID, PlayerHiveData> PLAYER_DATA = new HashMap<>();
+  // In-memory cache for active players
+  private static final Map<UUID, PlayerHiveData> PLAYER_DATA = new HashMap<>();
 
-    // NBT keys
-    private static final String NBT_ACCESS = "hasAccess";
-    private static final String NBT_HIVE_ID = "hiveId";
-    private static final String NBT_JOIN_TIME = "joinTime";
+  // NBT keys
+  private static final String NBT_ACCESS = "hasAccess";
+  private static final String NBT_HIVE_ID = "hiveId";
+  private static final String NBT_JOIN_TIME = "joinTime";
 
-    public static class PlayerHiveData {
-        public boolean hasAccess = false;
-        public UUID hiveId = null;
-        public long joinTime = 0;
+  public static class PlayerHiveData {
+    public boolean hasAccess = false;
+    public UUID hiveId = null;
+    public long joinTime = 0;
 
-        public NbtCompound toNbt() {
-            NbtCompound nbt = new NbtCompound();
-            nbt.putBoolean(NBT_ACCESS, hasAccess);
-            if (hiveId != null) {
-                nbt.putUuid(NBT_HIVE_ID, hiveId);
-            }
-            nbt.putLong(NBT_JOIN_TIME, joinTime);
-            return nbt;
-        }
-
-        public static PlayerHiveData fromNbt(NbtCompound nbt) {
-            PlayerHiveData data = new PlayerHiveData();
-            data.hasAccess = nbt.getBoolean(NBT_ACCESS);
-            if (nbt.contains(NBT_HIVE_ID)) {
-                data.hiveId = nbt.getUuid(NBT_HIVE_ID);
-            }
-            data.joinTime = nbt.getLong(NBT_JOIN_TIME);
-            return data;
-        }
+    public NbtCompound toNbt() {
+      NbtCompound nbt = new NbtCompound();
+      nbt.putBoolean(NBT_ACCESS, hasAccess);
+      if (hiveId != null) {
+        nbt.putUuid(NBT_HIVE_ID, hiveId);
+      }
+      nbt.putLong(NBT_JOIN_TIME, joinTime);
+      return nbt;
     }
 
-    /**
-     * Get the save file for a player
-     */
-    private static File getPlayerDataFile(ServerPlayerEntity player) {
-        World world = player.getWorld();
-        File worldDir = world.getServer().getRunDirectory();
-        File savesDir = new File(worldDir, "saves");
-        File currentWorldDir = new File(savesDir, world.getServer()
-                .getSaveProperties().getLevelName());
-        File hivemindDir = new File(worldDir, "hivemind");
+    public static PlayerHiveData fromNbt(NbtCompound nbt) {
+      PlayerHiveData data = new PlayerHiveData();
+      data.hasAccess = nbt.getBoolean(NBT_ACCESS);
+      if (nbt.contains(NBT_HIVE_ID)) {
+        data.hiveId = nbt.getUuid(NBT_HIVE_ID);
+      }
+      data.joinTime = nbt.getLong(NBT_JOIN_TIME);
+      return data;
+    }
+  }
 
-        if (!hivemindDir.exists()) {
-            hivemindDir.mkdirs();
-        }
+  /** Get the save file for a player */
+  private static File getPlayerDataFile(ServerPlayerEntity player) {
+    World world = player.getWorld();
+    File worldDir = world.getServer().getRunDirectory();
+    File savesDir = new File(worldDir, "saves");
+    File currentWorldDir = new File(savesDir, world.getServer().getSaveProperties().getLevelName());
+    File hivemindDir = new File(worldDir, "hivemind");
 
-        return new File(hivemindDir, player.getUuidAsString() + ".dat");
+    if (!hivemindDir.exists()) {
+      hivemindDir.mkdirs();
     }
 
-    /**
-     * Load data from file
-     */
-    private static PlayerHiveData loadFromFile(ServerPlayerEntity player) {
-        File dataFile = getPlayerDataFile(player);
+    return new File(hivemindDir, player.getUuidAsString() + ".dat");
+  }
 
-        if (dataFile.exists()) {
-            try {
-                NbtCompound nbt = NbtIo.read(dataFile);
-                Hivemind.LOGGER.debug("Loaded existing data from file for {}", player.getName().getString());
-                return PlayerHiveData.fromNbt(nbt);
-            } catch (IOException e) {
-                Hivemind.LOGGER.error("Failed to load data for {}", player.getName().getString(), e);
-            }
-        }
+  /** Load data from file */
+  private static PlayerHiveData loadFromFile(ServerPlayerEntity player) {
+    File dataFile = getPlayerDataFile(player);
 
-        Hivemind.LOGGER.debug("No existing data file, creating new for {}", player.getName().getString());
-        return new PlayerHiveData();
+    if (dataFile.exists()) {
+      try {
+        NbtCompound nbt = NbtIo.read(dataFile);
+        Hivemind.LOGGER.debug(
+            "Loaded existing data from file for {}", player.getName().getString());
+        return PlayerHiveData.fromNbt(nbt);
+      } catch (IOException e) {
+        Hivemind.LOGGER.error("Failed to load data for {}", player.getName().getString(), e);
+      }
     }
 
-    /**
-     * Save data to file
-     */
-    private static void saveToFile(ServerPlayerEntity player, PlayerHiveData data) {
-        File dataFile = getPlayerDataFile(player);
+    Hivemind.LOGGER.debug(
+        "No existing data file, creating new for {}", player.getName().getString());
+    return new PlayerHiveData();
+  }
 
-        try {
-            NbtIo.write(data.toNbt(), dataFile);
-            Hivemind.LOGGER.debug("Saved data to file for {}", player.getName().getString());
-        } catch (IOException e) {
-            Hivemind.LOGGER.error("Failed to save data for {}", player.getName().getString(), e);
-        }
+  /** Save data to file */
+  private static void saveToFile(ServerPlayerEntity player, PlayerHiveData data) {
+    File dataFile = getPlayerDataFile(player);
+
+    try {
+      NbtIo.write(data.toNbt(), dataFile);
+      Hivemind.LOGGER.debug("Saved data to file for {}", player.getName().getString());
+    } catch (IOException e) {
+      Hivemind.LOGGER.error("Failed to save data for {}", player.getName().getString(), e);
+    }
+  }
+
+  /** Get or create player data */
+  public static PlayerHiveData getData(PlayerEntity player) {
+    if (!(player instanceof ServerPlayerEntity serverPlayer)) {
+      return new PlayerHiveData(); // Client-side, return empty
     }
 
-    /**
-     * Get or create player data
-     */
-    public static PlayerHiveData getData(PlayerEntity player) {
-        if (!(player instanceof ServerPlayerEntity serverPlayer)) {
-            return new PlayerHiveData(); // Client-side, return empty
-        }
+    UUID uuid = player.getUuid();
 
-        UUID uuid = player.getUuid();
-
-        // Check cache first
-        if (!PLAYER_DATA.containsKey(uuid)) {
-            // Load from file
-            PlayerHiveData data = loadFromFile(serverPlayer);
-            PLAYER_DATA.put(uuid, data);
-        }
-
-        return PLAYER_DATA.get(uuid);
+    // Check cache first
+    if (!PLAYER_DATA.containsKey(uuid)) {
+      // Load from file
+      PlayerHiveData data = loadFromFile(serverPlayer);
+      PLAYER_DATA.put(uuid, data);
     }
 
-    /**
-     * Check if player has HiveMind access
-     */
-    public static boolean hasAccess(PlayerEntity player) {
-        boolean access = getData(player).hasAccess;
-        Hivemind.LOGGER.debug("Checking access for {}: {}", player.getName().getString(), access);
-        return access;
+    return PLAYER_DATA.get(uuid);
+  }
+
+  /** Check if player has HiveMind access */
+  public static boolean hasAccess(PlayerEntity player) {
+    boolean access = getData(player).hasAccess;
+    Hivemind.LOGGER.debug("Checking access for {}: {}", player.getName().getString(), access);
+    return access;
+  }
+
+  /** Set HiveMind access for player */
+  public static void setAccess(PlayerEntity player, boolean access) {
+    if (!(player instanceof ServerPlayerEntity serverPlayer)) return;
+
+    PlayerHiveData data = getData(player);
+    data.hasAccess = access;
+
+    if (access && data.hiveId == null) {
+      data.hiveId = player.getUuid();
+      data.joinTime = System.currentTimeMillis();
     }
 
-    /**
-     * Set HiveMind access for player
-     */
-    public static void setAccess(PlayerEntity player, boolean access) {
-        if (!(player instanceof ServerPlayerEntity serverPlayer)) return;
+    // Save immediately to file
+    saveToFile(serverPlayer, data);
 
-        PlayerHiveData data = getData(player);
-        data.hasAccess = access;
+    Hivemind.LOGGER.debug("Set access for {} to {}", player.getName().getString(), access);
+  }
 
-        if (access && data.hiveId == null) {
-            data.hiveId = player.getUuid();
-            data.joinTime = System.currentTimeMillis();
-        }
+  /** Get player's Hive ID */
+  public static UUID getHiveId(PlayerEntity player) {
+    return getData(player).hiveId;
+  }
 
-        // Save immediately to file
-        saveToFile(serverPlayer, data);
+  /** Get join time */
+  public static long getJoinTime(PlayerEntity player) {
+    return getData(player).joinTime;
+  }
 
-        Hivemind.LOGGER.debug("Set access for {} to {}", player.getName().getString(), access);
+  /** Calculate membership duration */
+  public static long getMembershipDuration(PlayerEntity player) {
+    long joinTime = getJoinTime(player);
+    if (joinTime == 0) return 0;
+    return System.currentTimeMillis() - joinTime;
+  }
+
+  /** Initialize new member */
+  public static void initializeNewMember(PlayerEntity player) {
+    Hivemind.LOGGER.debug("Initializing new member: {}", player.getName().getString());
+    setAccess(player, true);
+  }
+
+  /** Get player status string */
+  public static String getPlayerStatus(PlayerEntity player) {
+    if (!hasAccess(player)) {
+      return "Not a HiveMind member";
     }
 
-    /**
-     * Get player's Hive ID
-     */
-    public static UUID getHiveId(PlayerEntity player) {
-        return getData(player).hiveId;
+    UUID hiveId = getHiveId(player);
+    long duration = getMembershipDuration(player);
+    long durationSeconds = duration / 1000;
+
+    String droneInfo = "";
+    if (player instanceof ServerPlayerEntity serverPlayer) {
+      int droneCount =
+          net.sanfonic.hivemind.data.HiveMindData.HiveMindData.getDroneCount(serverPlayer);
+      droneInfo = " | Drones: " + droneCount;
     }
 
-    /**
-     * Get join time
-     */
-    public static long getJoinTime(PlayerEntity player) {
-        return getData(player).joinTime;
+    return String.format(
+        "HiveMind Member | Hive: %s | Member for: %ds%s",
+        hiveId.toString().substring(0, 8), durationSeconds, droneInfo);
+  }
+
+  /** Called when player joins - load their data */
+  public static void onPlayerJoin(ServerPlayerEntity player) {
+    Hivemind.LOGGER.debug("Player joined: {}", player.getName().getString());
+    // Force reload from file
+    PLAYER_DATA.remove(player.getUuid());
+    getData(player); // This will trigger loadFromFile
+  }
+
+  /** Called when player leaves - save and cleanup */
+  public static void onPlayerLeave(ServerPlayerEntity player) {
+    Hivemind.LOGGER.debug("Player leaving: {}", player.getName().getString());
+    PlayerHiveData data = PLAYER_DATA.get(player.getUuid());
+    if (data != null) {
+      saveToFile(player, data);
     }
-
-    /**
-     * Calculate membership duration
-     */
-    public static long getMembershipDuration(PlayerEntity player) {
-        long joinTime = getJoinTime(player);
-        if (joinTime == 0) return 0;
-        return System.currentTimeMillis() - joinTime;
-    }
-
-    /**
-     * Initialize new member
-     */
-    public static void initializeNewMember(PlayerEntity player) {
-        Hivemind.LOGGER.debug("Initializing new member: {}", player.getName().getString());
-        setAccess(player, true);
-    }
-
-    /**
-     * Get player status string
-     */
-    public static String getPlayerStatus(PlayerEntity player) {
-        if (!hasAccess(player)) {
-            return "Not a HiveMind member";
-        }
-
-        UUID hiveId = getHiveId(player);
-        long duration = getMembershipDuration(player);
-        long durationSeconds = duration / 1000;
-
-        String droneInfo = "";
-        if (player instanceof ServerPlayerEntity serverPlayer) {
-            int droneCount = net.sanfonic.hivemind.data.HiveMindData.HiveMindData.getDroneCount(serverPlayer);
-            droneInfo = " | Drones: " + droneCount;
-        }
-
-        return String.format("HiveMind Member | Hive: %s | Member for: %ds%s",
-                hiveId.toString().substring(0, 8),
-                durationSeconds,
-                droneInfo
-        );
-    }
-
-    /**
-     * Called when player joins - load their data
-     */
-    public static void onPlayerJoin(ServerPlayerEntity player) {
-        Hivemind.LOGGER.debug("Player joined: {}", player.getName().getString());
-        // Force reload from file
-        PLAYER_DATA.remove(player.getUuid());
-        getData(player); // This will trigger loadFromFile
-    }
-
-    /**
-     * Called when player leaves - save and cleanup
-     */
-    public static void onPlayerLeave(ServerPlayerEntity player) {
-        Hivemind.LOGGER.debug("Player leaving: {}", player.getName().getString());
-        PlayerHiveData data = PLAYER_DATA.get(player.getUuid());
-        if (data != null) {
-            saveToFile(player, data);
-        }
-        // Keep in cache for potential quick rejoin
-    }
+    // Keep in cache for potential quick rejoin
+  }
 }

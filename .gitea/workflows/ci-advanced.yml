@@ -18,7 +18,7 @@ concurrency:
 jobs:
   # Job 1: Cache warmup (optional - helps if many runners share cache)
   cache-warmup:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: gradle:8.3-jdk17
     steps:
@@ -39,7 +39,7 @@ jobs:
 
   # Job 2: Tests
   test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: gradle:8.3-jdk17
     needs: cache-warmup
@@ -67,7 +67,7 @@ jobs:
 
   # Job 3: Build
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: gradle:8.3-jdk17
     needs: cache-warmup
@@ -99,7 +99,7 @@ jobs:
 
   # Job 4: Integration tests (main only)
   integration-test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: gradle:8.3-jdk17
     needs: [ test, build ]

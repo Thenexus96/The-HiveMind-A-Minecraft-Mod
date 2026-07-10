@@ -19,159 +19,159 @@ import net.sanfonic.hivemind.entity.DroneEntity;
 import net.sanfonic.hivemind.entity.ModEntities;
 
 public class DroneCoreItem extends Item {
-    public DroneCoreItem(Settings settings) {
-        super(settings);
+  public DroneCoreItem(Settings settings) {
+    super(settings);
+  }
+
+  @Override
+  public ActionResult useOnBlock(ItemUsageContext context) {
+    World world = context.getWorld();
+    BlockPos pos = context.getBlockPos();
+    PlayerEntity player = context.getPlayer();
+    ItemStack stack = context.getStack();
+
+    if (player == null) {
+      return ActionResult.FAIL;
     }
 
-    @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        World world = context.getWorld();
-        BlockPos pos = context.getBlockPos();
-        PlayerEntity player = context.getPlayer();
-        ItemStack stack = context.getStack();
+    if (!world.isClient) {
+      // Check access only on server
+      if (!PlayerHiveComponent.hasAccess(player)) {
+        player.sendMessage(
+            Text.literal("⚠ ")
+                .formatted(Formatting.RED)
+                .append(
+                    Text.literal("You need HiveMind access to deploy drones!")
+                        .formatted(Formatting.GRAY)),
+            false);
+        return ActionResult.FAIL;
+      }
 
-        if (player == null) {
-            return ActionResult.FAIL;
+      ServerWorld serverWorld = (ServerWorld) world;
+
+      // Get the position to spawn the drone (above the clicked block)
+      Direction facing = context.getSide();
+      BlockPos spawnPos = pos.offset(facing);
+
+      // Check if there's enough space
+      if (!world.isAir(spawnPos) || !world.isAir(spawnPos.up())) {
+        player.sendMessage(
+            Text.literal("⚠ Not enough space to deploy drone!").formatted(Formatting.RED), false);
+        return ActionResult.FAIL;
+      }
+
+      // Create and spawn the drone
+      DroneEntity drone = ModEntities.DRONE.create(world);
+      if (drone != null) {
+        // Position the drone
+        drone.refreshPositionAndAngles(
+            spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5, player.getYaw(), 0.0F);
+
+        // Link the drone to the player
+        drone.setHiveMindOwnerUuid(player.getUuid());
+
+        // Spawn the entity
+        world.spawnEntity(drone);
+
+        // Play activation sound
+        world.playSound(
+            null,
+            spawnPos,
+            SoundEvents.BLOCK_BEACON_POWER_SELECT,
+            SoundCategory.BLOCKS,
+            1.0F,
+            1.2F);
+
+        // Spawn activation particles
+        spawnActivationParticles(serverWorld, spawnPos);
+
+        // Send success message with HiveCode
+        String hiveCode = drone.getHiveCode();
+        player.sendMessage(
+            Text.literal("✓ ")
+                .formatted(Formatting.GREEN)
+                .append(Text.literal("Drone ").formatted(Formatting.GRAY))
+                .append(Text.literal(hiveCode).formatted(Formatting.GOLD, Formatting.BOLD))
+                .append(Text.literal(" deployed!").formatted(Formatting.GRAY)),
+            false);
+
+        // Consume the item
+        if (!player.getAbilities().creativeMode) {
+          stack.decrement(1);
         }
 
-        if (!world.isClient) {
-            // Check access only on server
-            if (!PlayerHiveComponent.hasAccess(player)) {
-                player.sendMessage(
-                        Text.literal("⚠ ").formatted(Formatting.RED)
-                                .append(Text.literal("You need HiveMind access to deploy drones!").formatted(Formatting.GRAY)),
-                        false
-                );
-                return ActionResult.FAIL;
-            }
-
-            ServerWorld serverWorld = (ServerWorld) world;
-
-            // Get the position to spawn the drone (above the clicked block)
-            Direction facing = context.getSide();
-            BlockPos spawnPos = pos.offset(facing);
-
-            // Check if there's enough space
-            if (!world.isAir(spawnPos) || !world.isAir(spawnPos.up())) {
-                player.sendMessage(
-                        Text.literal("⚠ Not enough space to deploy drone!").formatted(Formatting.RED),
-                        false
-                );
-                return ActionResult.FAIL;
-            }
-
-            // Create and spawn the drone
-            DroneEntity drone = ModEntities.DRONE.create(world);
-            if (drone != null) {
-                // Position the drone
-                drone.refreshPositionAndAngles(
-                        spawnPos.getX() + 0.5,
-                        spawnPos.getY(),
-                        spawnPos.getZ() + 0.5,
-                        player.getYaw(),
-                        0.0F
-                );
-
-                // Link the drone to the player
-                drone.setHiveMindOwnerUuid(player.getUuid());
-
-                // Spawn the entity
-                world.spawnEntity(drone);
-
-                // Play activation sound
-                world.playSound(
-                        null,
-                        spawnPos,
-                        SoundEvents.BLOCK_BEACON_POWER_SELECT,
-                        SoundCategory.BLOCKS,
-                        1.0F,
-                        1.2F
-                );
-
-                // Spawn activation particles
-                spawnActivationParticles(serverWorld, spawnPos);
-
-                // Send success message with HiveCode
-                String hiveCode = drone.getHiveCode();
-                player.sendMessage(
-                        Text.literal("✓ ").formatted(Formatting.GREEN)
-                                .append(Text.literal("Drone ").formatted(Formatting.GRAY))
-                                .append(Text.literal(hiveCode).formatted(Formatting.GOLD, Formatting.BOLD))
-                                .append(Text.literal(" deployed!").formatted(Formatting.GRAY)),
-                        false
-                );
-
-                // Consume the item
-                if (!player.getAbilities().creativeMode) {
-                    stack.decrement(1);
-                }
-
-                return ActionResult.SUCCESS;
-            }
-        }
-
-        return ActionResult.success(world.isClient);
+        return ActionResult.SUCCESS;
+      }
     }
 
-    /**
-     * Spawn particle effects when a drone is deployed
-     */
-    private void spawnActivationParticles(ServerWorld world, BlockPos pos) {
-        double x = pos.getX() + 0.5;
-        double y = pos.getY() + 0.5;
-        double z = pos.getZ() + 0.5;
+    return ActionResult.success(world.isClient);
+  }
 
-        // Central burst
-        world.spawnParticles(
-                ParticleTypes.ELECTRIC_SPARK,
-                x, y, z,
-                20, // count
-                0.3, 0.5, 0.3, // spread
-                0.1 // speed
+  /** Spawn particle effects when a drone is deployed */
+  private void spawnActivationParticles(ServerWorld world, BlockPos pos) {
+    double x = pos.getX() + 0.5;
+    double y = pos.getY() + 0.5;
+    double z = pos.getZ() + 0.5;
+
+    // Central burst
+    world.spawnParticles(
+        ParticleTypes.ELECTRIC_SPARK,
+        x,
+        y,
+        z,
+        20, // count
+        0.3,
+        0.5,
+        0.3, // spread
+        0.1 // speed
         );
 
-        // Rising spiral
-        for (int i = 0; i < 30; i++) {
-            double angle = (i / 30.0) * Math.PI * 4; // Two full rotations
-            double radius = 1.0;
-            double height = (i / 30.0) * 2.0;
+    // Rising spiral
+    for (int i = 0; i < 30; i++) {
+      double angle = (i / 30.0) * Math.PI * 4; // Two full rotations
+      double radius = 1.0;
+      double height = (i / 30.0) * 2.0;
 
-            double offsetX = Math.cos(angle) * radius;
-            double offsetZ = Math.sin(angle) * radius;
+      double offsetX = Math.cos(angle) * radius;
+      double offsetZ = Math.sin(angle) * radius;
 
-            world.spawnParticles(
-                    ParticleTypes.END_ROD,
-                    x + offsetX,
-                    y + height,
-                    z + offsetZ,
-                    1, // count
-                    0.0, 0.0, 0.0, // spread
-                    0.02 // speed
-            );
-        }
-
-        // Ground circle
-        for (int i = 0; i < 16; i++) {
-            double angle = (i / 16.0) * Math.PI * 2;
-            double radius = 1.5;
-
-            double offsetX = Math.cos(angle) * radius;
-            double offsetZ = Math.sin(angle) * radius;
-
-            world.spawnParticles(
-                    ParticleTypes.SOUL_FIRE_FLAME,
-                    x + offsetX,
-                    y + 0.1,
-                    z + offsetZ,
-                    3, // count
-                    0.1, 0.1, 0.1, // spread
-                    0.01 // speed
-            );
-        }
+      world.spawnParticles(
+          ParticleTypes.END_ROD,
+          x + offsetX,
+          y + height,
+          z + offsetZ,
+          1, // count
+          0.0,
+          0.0,
+          0.0, // spread
+          0.02 // speed
+          );
     }
 
-    @Override
-    public boolean hasGlint(ItemStack stack) {
-        return true; // Give it an enchanted look
+    // Ground circle
+    for (int i = 0; i < 16; i++) {
+      double angle = (i / 16.0) * Math.PI * 2;
+      double radius = 1.5;
+
+      double offsetX = Math.cos(angle) * radius;
+      double offsetZ = Math.sin(angle) * radius;
+
+      world.spawnParticles(
+          ParticleTypes.SOUL_FIRE_FLAME,
+          x + offsetX,
+          y + 0.1,
+          z + offsetZ,
+          3, // count
+          0.1,
+          0.1,
+          0.1, // spread
+          0.01 // speed
+          );
     }
+  }
+
+  @Override
+  public boolean hasGlint(ItemStack stack) {
+    return true; // Give it an enchanted look
+  }
 }
