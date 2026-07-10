@@ -363,11 +363,21 @@ GitHub/Gitea Issues and Milestones:
 
 Issues that need decisions before moving forward:
 
-1. **Drone Roles**: Should roles be class-based or skill-tree?
-2. **Combat**: Should drones be combat-focused or utility-focused?
-3. **Integration**: Which mods should we officially support?
-4. **Performance**: Acceptable limits for entity count?
-5. **Multiplayer**: Single-hive or per-player hives?
+### Decisions (July 2026)
+
+The following decisions were chosen to guide Phase 2 development (recorded July 2, 2026):
+
+1. **Drone Roles**: Both. Drones will use class-based role definitions (Scout, Soldier, Worker, etc.) implemented as concrete classes/components. The player's progression and hive-level advancement will be driven by a separate research/skill-tree system that improves the HiveMind or player NPCs (not the drone classes directly).
+
+2. **Combat Design**: Hybrid. All drone roles will have combat capability, but roles oriented toward combat (e.g., Soldier) will have higher base stats and combat-focused skills. Utility roles will gain limited combat effectiveness but excel at their non-combat tasks.
+
+3. **Integrations**: Deferred. Official third-party mod integrations are planned for a later production stage; not in Phase 2.
+
+4. **Multiplayer Hive Model**: Per-player hives by default, with the option to join another player's HiveMind. If a player joins, the joining player's hive will go dormant but their resources remain accessible to the host hive while joined.
+
+5. **Performance Targets & Server/Client Trade-offs**: Start conservative and expose as settings. The initial default will be a relatively low safe entity-count target (e.g., 50 drones) and move upward after profiling. A config option will allow server admins to choose higher targets (including a near-infinite option) but with clear warnings. See the new design doc `docs/DESIGN_DECISIONS.md` for details on server/client trade-offs.
+
+These choices will guide the Phase 2 sprint planning and implementation.
 
 ---
 

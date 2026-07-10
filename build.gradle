@@ -63,6 +63,10 @@ java {
 
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
+
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
 }
 
 // Integration test source set (disabled by default; requires Fabric test runtime)
@@ -76,6 +80,10 @@ sourceSets {
 configurations {
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+configurations.checkstyle {
+	exclude group: 'com.google.collections', module: 'google-collections'
 }
 
 dependencies {

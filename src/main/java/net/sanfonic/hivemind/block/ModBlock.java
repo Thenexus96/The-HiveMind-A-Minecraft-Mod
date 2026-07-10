@@ -13,22 +13,25 @@ import net.sanfonic.hivemind.Hivemind;
 
 public class ModBlock {
 
-    public static final Block HIVE_MATERIAL_BLOCK = registerBlock("hive_material_block",
-            new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)));
-    public static final Block HIVE_CORE = registerBlock("hive_core",
-            new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)));
+  public static final Block HIVE_MATERIAL_BLOCK =
+      registerBlock(
+          "hive_material_block", new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)));
+  public static final Block HIVE_CORE =
+      registerBlock("hive_core", new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)));
 
-    private static Block registerBlock(String name, Block block) {
-        registerBlockItem(name, block);
-        return Registry.register(Registries.BLOCK, new Identifier(Hivemind.MOD_ID, name), block);
-    }
+  private static Block registerBlock(String name, Block block) {
+    registerBlockItem(name, block);
+    return Registry.register(Registries.BLOCK, new Identifier(Hivemind.MOD_ID, name), block);
+  }
 
-    private static Item registerBlockItem(String name, Block block) {
-        return Registry.register(Registries.ITEM, new Identifier(Hivemind.MOD_ID, name),
-                new BlockItem(block, new FabricItemSettings()));
-    }
+  private static Item registerBlockItem(String name, Block block) {
+    return Registry.register(
+        Registries.ITEM,
+        new Identifier(Hivemind.MOD_ID, name),
+        new BlockItem(block, new FabricItemSettings()));
+  }
 
-    public static void registerModBlocks() {
-        Hivemind.LOGGER.info("Registering ModBlocks for " + Hivemind.MOD_ID);
-    }
+  public static void registerModBlocks() {
+    Hivemind.LOGGER.info("Registering ModBlocks for " + Hivemind.MOD_ID);
+  }
 }
