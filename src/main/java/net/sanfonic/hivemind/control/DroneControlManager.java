@@ -10,6 +10,7 @@ import net.sanfonic.hivemind.network.NetworkHandler;
 import net.sanfonic.hivemind.network.packets.DroneControlPacket;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,17 +22,13 @@ public class DroneControlManager {
         // Register server tick event
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             // Clean up dead drone sessions
-            activeSessions.entrySet().removeIf(entry -> {
-                DroneControlSession session = entry.getValue();
-                if (!session.getDrone().isAlive()) {
-                    ServerPlayerEntity player = session.getPlayer();
-                    if (player != null && player.isAlive()) {
-                        releaseControl(player);
-                    }
-                    return true;
-                }
-                return false;
-            });
+            List<ServerPlayerEntity> playersToRelease = activeSessions.values().stream()
+                    .filter(session -> !session.getDrone().isAlive())
+                    .map(DroneControlSession::getPlayer)
+                    .filter(player -> player != null && player.isAlive())
+                    .toList();
+
+            playersToRelease.forEach(DroneControlManager::releaseControl);
         });
     }
 
@@ -40,9 +37,17 @@ public class DroneControlManager {
             return false;
         }
 
+        if (!canPlayerControlDrone(player, drone)) {
+            return false;
+        }
+
         // Check if drone is already controlled
         if (isDroneControlled(drone)) {
             return false;
+        }
+
+        if (isPlayerControllingDrone(player)) {
+            releaseControl(player);
         }
 
         // Save player's current state
@@ -78,7 +83,10 @@ public class DroneControlManager {
             restorePlayerState(player);
 
             // Resume AI control of drone
-            if (session.getDrone().isAlive()) {session.getDrone().resumeAIControl();}
+            if (session.getDrone().isAlive()) {
+                session.getDrone().clearControllingPlayer();
+                session.getDrone().resumeAIControl();
+            }
 
             // Cleanup
             activeSessions.remove(playerId);
@@ -93,12 +101,13 @@ public class DroneControlManager {
     private static void transferControlToDrone(ServerPlayerEntity player, DroneEntity drone) {
         // Pause AI control
         drone.pauseAIControl();
+        drone.setControllingPlayer(player.getUuid());
 
         // Set camera to drone
         player.networkHandler.sendPacket(new SetCameraEntityS2CPacket(drone));
 
         // Modify player abilities from drone control
-        PlayerAbilities abilities = new PlayerAbilities();
+        PlayerAbilities abilities = player.getAbilities();
         abilities.flying = true;
         abilities.allowFlying = true;
         abilities.invulnerable = true;
@@ -107,6 +116,7 @@ public class DroneControlManager {
         abilities.setWalkSpeed(0.1f);
         abilities.setFlySpeed(drone.getFlySpeed());
 
+        player.sendAbilitiesUpdate();
         player.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(abilities));
 
         // Notify client of control transfer
@@ -139,6 +149,7 @@ public class DroneControlManager {
         PlayerState state = savedPlayerStates.get(player.getUuid());
         if (state != null) {
             player.teleport(state.getPosition().x, state.getPosition().y, state.getPosition().z);
+            player.setYaw(state.getyRot());
             player.setPitch(state.getxRot());
 
             // Manually copied abilities back
@@ -164,6 +175,13 @@ public class DroneControlManager {
     public static boolean isDroneControlled(DroneEntity drone) {
         return activeSessions.values().stream()
                 .anyMatch(session -> session.getDrone().equals(drone));
+    }
+
+    public static boolean canPlayerControlDrone(ServerPlayerEntity player, DroneEntity drone) {
+        return player != null
+                && drone != null
+                && drone.hasHiveMindOwner()
+                && player.getUuid().equals(drone.getHiveMindOwnerUuid());
     }
 
     public static DroneEntity getControlledDrone(ServerPlayerEntity player) {

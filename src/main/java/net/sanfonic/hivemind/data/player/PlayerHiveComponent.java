@@ -6,6 +6,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
+import net.sanfonic.hivemind.Hivemind;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,15 +80,14 @@ public class PlayerHiveComponent {
         if (dataFile.exists()) {
             try {
                 NbtCompound nbt = NbtIo.read(dataFile);
-                System.out.println("[HiveMind] Loaded existing data from file for: " + player.getName().getString());
+                Hivemind.LOGGER.debug("Loaded existing data from file for {}", player.getName().getString());
                 return PlayerHiveData.fromNbt(nbt);
             } catch (IOException e) {
-                System.err.println("[HiveMind] Failed to load data for " + player
-                        .getName().getString() + ": " + e.getMessage());
+                Hivemind.LOGGER.error("Failed to load data for {}", player.getName().getString(), e);
             }
         }
 
-        System.out.println("[HiveMind] No existing data file, creating new for: " + player.getName().getString());
+        Hivemind.LOGGER.debug("No existing data file, creating new for {}", player.getName().getString());
         return new PlayerHiveData();
     }
 
@@ -99,11 +99,9 @@ public class PlayerHiveComponent {
 
         try {
             NbtIo.write(data.toNbt(), dataFile);
-            System.out.println("[HiveMind] Saved data to file for: " + player.getName().getString());
+            Hivemind.LOGGER.debug("Saved data to file for {}", player.getName().getString());
         } catch (IOException e) {
-            System.err.println("[HiveMind] Failed to save data for " + player
-                    .getName().getString() + ": " + e.getMessage());
-            e.printStackTrace();
+            Hivemind.LOGGER.error("Failed to save data for {}", player.getName().getString(), e);
         }
     }
 
@@ -132,7 +130,7 @@ public class PlayerHiveComponent {
      */
     public static boolean hasAccess(PlayerEntity player) {
         boolean access = getData(player).hasAccess;
-        System.out.println("[HiveMind] Checking access for " + player.getName().getString() + ": " + access);
+        Hivemind.LOGGER.debug("Checking access for {}: {}", player.getName().getString(), access);
         return access;
     }
 
@@ -153,7 +151,7 @@ public class PlayerHiveComponent {
         // Save immediately to file
         saveToFile(serverPlayer, data);
 
-        System.out.println("[HiveMind] Set access for " + player.getName().getString() + " to: " + access);
+        Hivemind.LOGGER.debug("Set access for {} to {}", player.getName().getString(), access);
     }
 
     /**
@@ -183,7 +181,7 @@ public class PlayerHiveComponent {
      * Initialize new member
      */
     public static void initializeNewMember(PlayerEntity player) {
-        System.out.println("[HiveMind] Initializing new member: " + player.getName().getString());
+        Hivemind.LOGGER.debug("Initializing new member: {}", player.getName().getString());
         setAccess(player, true);
     }
 
@@ -216,7 +214,7 @@ public class PlayerHiveComponent {
      * Called when player joins - load their data
      */
     public static void onPlayerJoin(ServerPlayerEntity player) {
-        System.out.println("[HiveMind] Player joined: " + player.getName().getString());
+        Hivemind.LOGGER.debug("Player joined: {}", player.getName().getString());
         // Force reload from file
         PLAYER_DATA.remove(player.getUuid());
         getData(player); // This will trigger loadFromFile
@@ -226,7 +224,7 @@ public class PlayerHiveComponent {
      * Called when player leaves - save and cleanup
      */
     public static void onPlayerLeave(ServerPlayerEntity player) {
-        System.out.println("[HiveMind] Player leaving: " + player.getName().getString());
+        Hivemind.LOGGER.debug("Player leaving: {}", player.getName().getString());
         PlayerHiveData data = PLAYER_DATA.get(player.getUuid());
         if (data != null) {
             saveToFile(player, data);

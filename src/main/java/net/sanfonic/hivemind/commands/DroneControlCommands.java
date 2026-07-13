@@ -11,7 +11,6 @@ import net.minecraft.text.Text;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.sanfonic.hivemind.control.DroneControlManager;
-import net.sanfonic.hivemind.control.DroneControlSession;
 import net.sanfonic.hivemind.entity.DroneEntity;
 
 public class DroneControlCommands {
@@ -23,18 +22,18 @@ public class DroneControlCommands {
     }
 
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
-        CommandManager.literal("list")
-                .executes(DroneControlCommands::listDrones)
-                .then(dispatcher.register(CommandManager.literal("hivemind")
-                        .then(CommandManager.literal("control")
-                                .then(CommandManager.argument("drone", EntityArgumentType.entity())
-                                        .executes(DroneControlCommands::controlDrone)))
-                        .then(CommandManager.literal("release")
-                                .executes(DroneControlCommands::releaseControl))))
+        dispatcher.register(CommandManager.literal("hivemind")
+                .then(CommandManager.literal("control")
+                        .then(CommandManager.argument("drone", EntityArgumentType.entity())
+                                .executes(DroneControlCommands::controlDrone)))
+                .then(CommandManager.literal("release")
+                        .executes(DroneControlCommands::releaseControl))
+                .then(CommandManager.literal("list")
+                        .executes(DroneControlCommands::listDrones))
                 .then(CommandManager.literal("controlnearest")
                         .executes(DroneControlCommands::controlNearestDrone)
                         .then(CommandManager.argument("range", IntegerArgumentType.integer(1, 100))
-                                .executes(DroneControlCommands::controlNearestDroneWithRange)));
+                                .executes(DroneControlCommands::controlNearestDroneWithRange))));
     }
 
     private static int controlDrone(CommandContext<ServerCommandSource> context) {
@@ -44,6 +43,11 @@ public class DroneControlCommands {
 
             if (!(entity instanceof DroneEntity drone)) {
                 context.getSource().sendError(Text.literal("Target is not a drone!"));
+                return 0;
+            }
+
+            if (!DroneControlManager.canPlayerControlDrone(player, drone)) {
+                context.getSource().sendError(Text.literal("You can only control drones linked to your HiveMind."));
                 return 0;
             }
 
@@ -86,7 +90,8 @@ public class DroneControlCommands {
             java.util.List<DroneEntity> nearbyDrones = player.getWorld()
                     .getEntitiesByClass(DroneEntity.class,
                             player.getBoundingBox().expand(50.0),
-                            drone -> !DroneControlManager.isDroneControlled(drone));
+                            drone -> !DroneControlManager.isDroneControlled(drone)
+                                    && DroneControlManager.canPlayerControlDrone(player, drone));
 
             if (nearbyDrones.isEmpty()) {
                 context.getSource().sendFeedback(() -> Text.literal("No available drones found nearby."), false);
@@ -134,7 +139,8 @@ public class DroneControlCommands {
             DroneEntity nearestDrone = player.getWorld()
                     .getEntitiesByClass(DroneEntity.class,
                             player.getBoundingBox().expand(range),
-                            drone -> !DroneControlManager.isDroneControlled(drone))
+                            drone -> !DroneControlManager.isDroneControlled(drone)
+                                    && DroneControlManager.canPlayerControlDrone(player, drone))
                     .stream()
                     .min((d1, d2) -> Double.compare(player.distanceTo(d1), player.distanceTo(d2)))
                     .orElse(null);

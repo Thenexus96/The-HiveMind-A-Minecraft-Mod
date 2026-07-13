@@ -6,6 +6,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
+import net.sanfonic.hivemind.Hivemind;
+import net.sanfonic.hivemind.data.DroneData.DroneTelemetryStore;
 import net.sanfonic.hivemind.entity.DroneEntity;
 
 import java.util.ArrayList;
@@ -26,11 +28,11 @@ public class HiveMindServerEvents {
 
     private static void onServerStarted(MinecraftServer server) {
         // Server started, data manager is now available
-        System.out.println("[HiveMind] Server started, data manager initialized");
+        Hivemind.LOGGER.info("Server started, data manager initialized");
     }
 
     private static void onWorldLoad(MinecraftServer server, ServerWorld world) {
-        System.out.println("[HiveMind] World loaded: " + world.getRegistryKey().getValue());
+        Hivemind.LOGGER.debug("World loaded: {}", world.getRegistryKey().getValue());
         // Restore drone connections for this world
         restoreDroneConnections(server, world);
     }
@@ -39,13 +41,13 @@ public class HiveMindServerEvents {
                                             ServerWorld origin, ServerWorld destination) {
         // Handle drone dimension changes
         if (newEntity instanceof DroneEntity drone) {
-            System.out.println("[HiveMind] Drone changing worlds, restoring connection...");
+            Hivemind.LOGGER.debug("Drone changing worlds, restoring connection");
             drone.restoreHiveMindConnection();
         }
     }
 
     private static void restoreDroneConnections(MinecraftServer server, ServerWorld world) {
-        System.out.println("[HiveMind] === Restoring Drone Connections ===");
+        Hivemind.LOGGER.debug("Restoring drone connections");
 
         // Find all drone entities in the world and restore their connections
         List<DroneEntity> drones = new ArrayList<>();
@@ -56,26 +58,27 @@ public class HiveMindServerEvents {
             }
         }
 
-        System.out.println("[HiveMind] Found " + drones.size() + " drones to restore");
+        Hivemind.LOGGER.debug("Found {} drones to restore", drones.size());
 
         // Restore connections for all drones
         for (DroneEntity drone : drones) {
-            System.out.println("[HiveMind] Restoring drone: " + drone.getUuid());
+            Hivemind.LOGGER.debug("Restoring drone: {}", drone.getUuid());
             drone.restoreHiveMindConnection();
 
             // Debug: Check if restoration worked
             if (drone.hasHiveMindOwner()) {
                 String hiveCode = drone.getHiveCode();
-                System.out.println("[HiveMind] ✓ Drone restored with HiveCode: " + hiveCode);
+                Hivemind.LOGGER.debug("Drone restored with HiveCode: {}", hiveCode);
             } else {
-                System.out.println("[HiveMind] ✗ Drone restoration failed!");
+                Hivemind.LOGGER.debug("Drone restoration found no owner data");
             }
         }
 
         // Clean up data for non-existent drones
         if (!drones.isEmpty()) {
-            HiveMindDataManager dataManager = HiveMindDataManager.getInstance(server);
+            HiveMindLinkManager linkManager = HiveMindLinkManager.getInstance(server);
             HiveCodeManager codeManager = HiveCodeManager.getInstance(server);
+            DroneTelemetryStore telemetry = DroneTelemetryStore.getInstance(server);
 
             List<UUID> existingDroneUUIDs = new ArrayList<>();
 
@@ -88,12 +91,13 @@ public class HiveMindServerEvents {
                 }
             }
 
-            System.out.println("[HiveMind] Cleaning up data for " + existingDroneUUIDs.size() + " existing drones");
-            dataManager.cleanupNonExistentDrones(existingDroneUUIDs);
+            Hivemind.LOGGER.debug("Cleaning up data for {} existing drones", existingDroneUUIDs.size());
+            if (linkManager != null) linkManager.cleanupNonExistentDrones(existingDroneUUIDs);
+            if (telemetry != null) telemetry.cleanupNonExistentDrones(existingDroneUUIDs);
             codeManager.cleanupInvalidCodes(existingDroneUUIDs);
         }
 
-        System.out.println("[HiveMind] Restored connections for " + drones.size() +
-                " drones in world: " + world.getRegistryKey().getValue());
+        Hivemind.LOGGER.debug("Restored connections for {} drones in world: {}",
+                drones.size(), world.getRegistryKey().getValue());
     }
 }

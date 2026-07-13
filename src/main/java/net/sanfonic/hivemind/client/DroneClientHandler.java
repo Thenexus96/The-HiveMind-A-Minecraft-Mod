@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.sanfonic.hivemind.Hivemind;
 import net.sanfonic.hivemind.entity.DroneEntity;
 import net.sanfonic.hivemind.network.NetworkHandler;
 import net.sanfonic.hivemind.network.packets.DroneControlPacket;
@@ -36,12 +37,12 @@ public class DroneClientHandler implements ClientModInitializer {
 
     // Packet rate limiting
     private static int packetTimer = 0;
-    private static final int PACKET_SEND_RATE = 2; // Send every 2 ticks instead of every tick
-    private static final float INPUT_THRESHOLD = 0.01f; // Minimum change to trigger packet send
+    private static final int PACKET_SEND_RATE = 1; // Rotation feels unstable if updates are skipped
+    private static final float INPUT_THRESHOLD = 0.001f; // Lower threshold makes camera response feel less sticky
 
     @Override
     public void onInitializeClient() {
-        System.out.println("DroneClientHandler initializing...");
+        Hivemind.LOGGER.debug("DroneClientHandler initializing");
 
         // Register client networking receivers
         registerNetworkHandlers();
@@ -53,7 +54,7 @@ public class DroneClientHandler implements ClientModInitializer {
             }
         });
 
-        System.out.println("DroneClientHandler initialized");
+        Hivemind.LOGGER.debug("DroneClientHandler initialized");
     }
 
         private static void registerNetworkHandlers() {
@@ -87,12 +88,15 @@ public class DroneClientHandler implements ClientModInitializer {
     }
 
     private static void startControllingDrone(MinecraftClient client, DroneEntity drone) {
-        System.out.println("Starting drone control for drone ID: " + drone.getId());
+        Hivemind.LOGGER.debug("Starting drone control for drone ID: {}", drone.getId());
 
         // Set control state
         isControllingDrone = true;
         controlledDrone = drone;
         controlledDroneId = drone.getId();
+        if (client.player != null) {
+            drone.setControllingPlayer(client.player.getUuid());
+        }
 
         // Initialize rotation for tracking, sync drone rotation with player BEFORE switching camera
         if (client.player != null) {
@@ -129,7 +133,11 @@ public class DroneClientHandler implements ClientModInitializer {
     }
 
     private static void stopControllingDrone(MinecraftClient client) {
-        System.out.println("Stopping drone control");
+        Hivemind.LOGGER.debug("Stopping drone control");
+
+        if (controlledDrone != null) {
+            controlledDrone.clearControllingPlayer();
+        }
 
         // Reset control state
         isControllingDrone = false;
@@ -167,8 +175,8 @@ public class DroneClientHandler implements ClientModInitializer {
             sneaking = true;
         }
 
-        // CRITICAL: Get rotation directly from player
-        // When camera is on drone, player rotation still tracks mouse movement
+        // Mouse input still updates the player rotation even while viewing through the drone.
+        // Use that as the source of truth, then mirror it onto the drone locally for smooth camera motion.
         float currentYaw = player.getYaw();
         float currentPitch = player.getPitch();
 
@@ -182,16 +190,8 @@ public class DroneClientHandler implements ClientModInitializer {
                 jumping != lastJumping ||
                 sneaking != lastSneaking;
 
-        // Check if rotation changed (mouse moved)
-        // IMMEDIATELY apply rotation to drone on client side for smooth camera
         if (rotationChanged) {
-            // Apply smoothing
-            float smoothYaw = net.minecraft.util.math.MathHelper.lerp(0.1f, lastYaw, currentYaw);
-            float smoothPitch = net.minecraft.util.math.MathHelper.lerp(0.1f, lastPitch, currentPitch);
-
-            // Update drone rotation on client immediately
             updateDroneRotationImmediate(controlledDrone, currentYaw, currentPitch);
-
             lastYaw = currentYaw;
             lastPitch = currentPitch;
         }
@@ -211,7 +211,7 @@ public class DroneClientHandler implements ClientModInitializer {
             DroneMovementPacket packet = new DroneMovementPacket(
                     forward, strafe, up,
                     jumping, sneaking,
-                    currentYaw, currentPitch // Use player's rotation
+                    currentYaw, currentPitch
             );
 
             sendDroneMovementPacket(packet);
@@ -226,10 +226,12 @@ public class DroneClientHandler implements ClientModInitializer {
 
             // Debug output
             if (player.age % 60 == 0 && (hasActiveInput || rotationChanged)) {
-                System.out.println("Drone Input - Movement: F=" + String.format("%.1f", forward) +
-                        " S=" + String.format("%.1f", strafe) + " U=" + String.format("%.1f", up) +
-                        " Rotation: Y=" + String.format("%.1f", currentYaw) +
-                        " P=" + String.format("%.1f", currentPitch));
+                Hivemind.LOGGER.debug("Drone input movement F={} S={} U={} rotation Y={} P={}",
+                        String.format("%.1f", forward),
+                        String.format("%.1f", strafe),
+                        String.format("%.1f", up),
+                        String.format("%.1f", currentYaw),
+                        String.format("%.1f", currentPitch));
             }
         }
     }
@@ -237,14 +239,7 @@ public class DroneClientHandler implements ClientModInitializer {
     // Helper method to immediately update drone rotation on client side
     private static void updateDroneRotationImmediate(DroneEntity drone, float yaw, float pitch) {
      // Use the drone's method, but also ensure client-side smoothness
-        drone.updateRotationImmediate(yaw,pitch);
-
-        // Additional client-side smoothing
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.world != null && client.world.isClient) {
-            // Force the drone's rotation to be exactly what we want
-            drone.refreshPositionAndAngles(drone.getX(), drone.getY(), drone.getZ(), yaw, pitch);
-        }
+        drone.updateRotationImmediate(yaw, pitch);
     }
 
     private static void resetInputTracking() {
@@ -276,7 +271,7 @@ public class DroneClientHandler implements ClientModInitializer {
 
     // User feedback methods
     private static void onDroneControlStart() {
-        System.out.println("Started controlling drone: " + controlledDroneId);
+        Hivemind.LOGGER.debug("Started controlling drone: {}", controlledDroneId);
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
@@ -285,7 +280,7 @@ public class DroneClientHandler implements ClientModInitializer {
     }
 
     private static void onDroneControlEnd() {
-        System.out.println("Stopped controlling drone");
+        Hivemind.LOGGER.debug("Stopped controlling drone");
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
@@ -315,6 +310,6 @@ public class DroneClientHandler implements ClientModInitializer {
     public static void init() {
         // This method can be called from your main mod initializer if needed
         // The actual initialization happens in onInitializeClient()
-        System.out.println("DroneClientHandler.init() called - initialization will happen on onInitializeClient()");
+        Hivemind.LOGGER.debug("DroneClientHandler.init() called; initialization happens in onInitializeClient()");
     }
 }

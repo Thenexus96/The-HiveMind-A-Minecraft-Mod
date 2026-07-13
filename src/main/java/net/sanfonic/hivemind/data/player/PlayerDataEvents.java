@@ -3,6 +3,7 @@ package net.sanfonic.hivemind.data.player;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.sanfonic.hivemind.Hivemind;
 
 /**
  * Handles saving and loading player HiveMind data
@@ -10,36 +11,32 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class PlayerDataEvents {
 
     public static void register() {
-        System.out.println("[HiveMind] Registering PlayerDataEvents...");
+        Hivemind.LOGGER.debug("Registering PlayerDataEvents");
 
         // Load data when player joins
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerPlayerEntity player = handler.getPlayer();
-            System.out.println("[HiveMind] === Player Join Event for: " + player.getName().getString() + " ===");
+            Hivemind.LOGGER.debug("Player join event for {}", player.getName().getString());
             PlayerHiveComponent.onPlayerJoin(player);
 
-            // Debug: Check if player has access after loading
             boolean hasAccess = PlayerHiveComponent.hasAccess(player);
-            System.out.println("[HiveMind] === Player " + player.getName().getString() + " has access: " + hasAccess);
+            Hivemind.LOGGER.debug("Player {} has access: {}", player.getName().getString(), hasAccess);
         });
 
 
         // Save data when player disconnects
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             ServerPlayerEntity player = handler.getPlayer();
-            System.out.println("[HiveMind] === Player Disconnect Event for: " + player.getName().getString() + " ===");
-            PlayerHiveComponent.onPlayerLeave(player);
-
-            // Debug: Check player's data before saving
             boolean hasAccess = PlayerHiveComponent.hasAccess(player);
-            System.out.println("[HiveMind] Saving data for " + player.getName().getString() + " (has access: " + hasAccess + ")");
+            Hivemind.LOGGER.debug("Player disconnect event for {} (has access: {})",
+                    player.getName().getString(), hasAccess);
 
             PlayerHiveComponent.onPlayerLeave(player);
         });
 
         // Handle respawn - Copy data to new entity
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
-            System.out.println("[HiveMind] === Player Respawn Event ===");
+            Hivemind.LOGGER.debug("Player respawn event for {}", newPlayer.getName().getString());
             // The data is store by UUID, so it should carry over automatically
             // Just force a save to be safe
             if (PlayerHiveComponent.hasAccess(newPlayer)) {
@@ -47,6 +44,6 @@ public class PlayerDataEvents {
             }
         });
 
-        System.out.println("[HiveMind] Player data events registered!");
+        Hivemind.LOGGER.debug("Player data events registered");
     }
 }
