@@ -57,19 +57,19 @@ Examples:
 Architecture decisions belong in:
 
 ```
-ADR/
+documentation/history/ADR/
 ```
 
 System design belongs in:
 
 ```
-01_Architecture/
+documentation/architecture/
 ```
 
 Exact behavior belongs in:
 
 ```
-02_Specifications/
+documentation/specs/
 ```
 
 Implementation details belong near the code.
@@ -87,7 +87,7 @@ Every document should belong to one category.
 Location:
 
 ```
-docs/00_Project/
+documentation/00_Project/
 ```
 
 Purpose:
@@ -108,7 +108,7 @@ These documents should change rarely.
 Location:
 
 ```
-docs/01_Architecture/
+documentation/architecture/
 ```
 
 Purpose:
@@ -129,7 +129,7 @@ Architecture documents should remain stable over time.
 Location:
 
 ```
-docs/02_Specifications/
+documentation/specs/
 ```
 
 Purpose:
@@ -150,7 +150,7 @@ Specifications evolve during development.
 Location:
 
 ```
-docs/03_Development/
+documentation/development/
 ```
 
 Purpose:
@@ -169,7 +169,7 @@ Define:
 Location:
 
 ```
-docs/04_History/
+documentation/history/
 ```
 
 Purpose:
@@ -190,7 +190,7 @@ Historical documents preserve context.
 Location:
 
 ```
-docs/05_Roadmap/
+documentation/roadmap/
 ```
 
 Purpose:
@@ -208,7 +208,7 @@ Define:
 Location:
 
 ```
-docs/06_Reference/
+documentation/reference/
 ```
 
 Purpose:

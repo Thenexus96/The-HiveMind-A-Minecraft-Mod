@@ -448,6 +448,8 @@ public class HiveMindCommands {
 
           DebugCommands.addDebugCommands(hiveCommand);
           DebugCommands.addHiveCommands(hiveCommand);
+          net.sanfonic.hivemind.commands.ResearchCommands.addResearchCommands(hiveCommand);
+          net.sanfonic.hivemind.commands.NodeCommands.addNodeCommands(hiveCommand);
 
           commandDispatcher.register(hiveCommand);
         }));

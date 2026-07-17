@@ -1,6 +1,6 @@
 # Continuous Integration (CI) — HiveMind
 
-**⚠️ Note**: This repository is **Gitea-first**. See `docs/GITEA_CI.md` for the primary CI guide if you use Gitea self-hosted.
+**⚠️ Note**: This repository is **Gitea-first**. See `documentation/GITEA_CI.md` for the primary CI guide if you use Gitea self-hosted.
 
 This document describes all CI platforms (Gitea, GitHub Actions) and how to run CI steps locally.
 
@@ -8,7 +8,7 @@ This document describes all CI platforms (Gitea, GitHub Actions) and how to run 
 
 | Platform | Status | Use Case | Guide |
 |----------|--------|----------|-------|
-| **Gitea** (Self-hosted) | ✅ PRIMARY | Daily development, main deployment | `docs/GITEA_CI.md` |
+| **Gitea** (Self-hosted) | ✅ PRIMARY | Daily development, main deployment | `documentation/GITEA_CI.md` |
 | **GitHub Actions** | ⏳ OPTIONAL | Secondary, mirror, or future migration | This page |
 
 ---
@@ -22,7 +22,7 @@ This document describes all CI platforms (Gitea, GitHub Actions) and how to run 
 3. **Triggers**: push/PR to `main`, `creation`, `testing`, `pre-release`
 4. **Runtime**: ~5-15 minutes
 
-**See full guide**: [`docs/GITEA_CI.md`](GITEA_CI.md)
+**See full guide**: [`documentation/GITEA_CI.md`](GITEA_CI.md)
 
 ### Quick Gitea CI Commands
 
@@ -154,5 +154,3 @@ If you want to extend CI (e.g., add Java 21 matrix, run datagen on a schedule, a
 1. Open an issue or PR with the desired behavior.
 2. Propose changes to the workflow files in `.github/workflows/`.
 3. Test locally first using `gradlew` commands, then update workflow YAML.
-
-

@@ -340,15 +340,15 @@ Progress tracked in GitHub/Gitea issues and PRs:
 
 ### Short Term (Next Release)
 
-See: `docs/roadmap/phase-2-drone-framework.md`
+See: `documentation/roadmap/phase-2-drone-framework.md`
 
 ### Medium Term (Next Phase)
 
-See: `docs/roadmap/phase-3-control-link.md`
+See: `documentation/roadmap/phase-3-control-link.md`
 
 ### Long Term (Future Phases)
 
-See: `docs/roadmap/` directory
+See: `documentation/roadmap/` directory
 
 ### Live Tracking
 
@@ -375,7 +375,7 @@ The following decisions were chosen to guide Phase 2 development (recorded July 
 
 4. **Multiplayer Hive Model**: Per-player hives by default, with the option to join another player's HiveMind. If a player joins, the joining player's hive will go dormant but their resources remain accessible to the host hive while joined.
 
-5. **Performance Targets & Server/Client Trade-offs**: Start conservative and expose as settings. The initial default will be a relatively low safe entity-count target (e.g., 50 drones) and move upward after profiling. A config option will allow server admins to choose higher targets (including a near-infinite option) but with clear warnings. See the new design doc `docs/DESIGN_DECISIONS.md` for details on server/client trade-offs.
+5. **Performance Targets & Server/Client Trade-offs**: Start conservative and expose as settings. The initial default will be a relatively low safe entity-count target (e.g., 50 drones) and move upward after profiling. A config option will allow server admins to choose higher targets (including a near-infinite option) but with clear warnings. See the new design doc `documentation/DESIGN_DECISIONS.md` for details on server/client trade-offs.
 
 These choices will guide the Phase 2 sprint planning and implementation.
 
@@ -408,7 +408,7 @@ Ways to provide feedback:
 
 ### Q: Will old 0.x features work in 1.0.0?
 
-**A**: See `docs/API_STABILITY.md` for API compatibility guarantees.
+**A**: See `documentation/API_STABILITY.md` for API compatibility guarantees.
 
 ### Q: How can I contribute to the roadmap?
 
@@ -422,9 +422,7 @@ Ways to provide feedback:
 
 ## References
 
-- **Current Phase Details**: `docs/roadmap/phase-2-drone-framework.md`
-- **API Stability**: `docs/API_STABILITY.md`
+- **Current Phase Details**: `documentation/roadmap/phase-2-drone-framework.md`
+- **API Stability**: `documentation/API_STABILITY.md`
 - **Contributing**: `CONTRIBUTING.md`
-- **Release Management**: `docs/RELEASE.md`
-
-
+- **Release Management**: `documentation/RELEASE.md`

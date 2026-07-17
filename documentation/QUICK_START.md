@@ -28,7 +28,7 @@ Or manually:
 ### 🧹 Clean up my local repository
 - Read: [Maintenance Guide](MAINTENANCE.md)
 - Quick clean: `./gradlew clean`
-- Full clean: `rm -rf ~/.gradle/ && ./gradlew build`
+- If a dependency or cache problem persists, follow the diagnosis steps in the maintenance guide before clearing any Gradle cache.
 
 ### 🐛 Report a bug
 - Use the bug report template: `.github/ISSUE_TEMPLATE/bug_report.md`
@@ -59,12 +59,11 @@ Use Debug Mode to speed development and inspect hive/drone state in-game. It is 
 Commands / Usage:
 
 ```bash
-# Toggle Debug Mode (in-game keybind will be documented in the developer guide)
-# (Example console command)
-/hivemind_debug toggle
+# Toggle Debug Mode
+/debug toggle
 
-# Dump selected entity data to server log
-/hivemind_debug dump
+# Dump Hive state
+/debug dump
 
 # Use Debug Mode to view: hovered entity id, role, owner, hive id, and basic performance counters
 ```
@@ -79,7 +78,7 @@ Enable Debug Mode while running an internal test world to visualize node links, 
 | `src/main/java/` | Main mod source code |
 | `src/test/java/` | Unit tests |
 | `src/integrationTest/java/` | Integration tests |
-| `docs/` | All documentation |
+| `documentation/` | All project documentation |
 | `.github/workflows/` | GitHub Actions CI workflows |
 | `scripts/check-ci.sh` | Local CI check script |
 | `build.gradle` | Gradle build configuration |
@@ -116,9 +115,8 @@ Enable Debug Mode while running an internal test world to visualize node links, 
 
 ## CI Status
 
-**Build**: [![Build Status](badge-url)](link)  
-**Code Quality**: [![Qodana](badge-url)](link)  
-**Tests**: Run on every PR and push
+**Build and test workflow**: See [Gitea CI](GITEA_CI.md) and [CI](CI.md).
+**Code quality**: See [Code Quality](CODE_QUALITY.md).
 
 All workflows are documented in [CI.md](CI.md).
 
@@ -126,7 +124,7 @@ All workflows are documented in [CI.md](CI.md).
 
 ## Need Help?
 
-- 📖 Check the [docs/](.) directory for comprehensive guides
+- 📖 Check the [documentation directory](.) for comprehensive guides
 - 🤝 Read [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution guidelines
 - 🔧 Review [CI.md](CI.md) for CI/troubleshooting
 - 📋 See [MAINTENANCE.md](MAINTENANCE.md) for repository maintenance

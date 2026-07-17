@@ -6,7 +6,6 @@ import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.sanfonic.hivemind.data.DroneData.DroneTelemetryStore;
 import net.sanfonic.hivemind.data.HiveMindData.HiveCodeManager;
-import net.sanfonic.hivemind.data.HiveMindData.HiveMindData;
 import net.sanfonic.hivemind.data.HiveMindData.HiveMindLinkManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,28 +28,54 @@ public class DroneLinkUtilsTest {
 
   @Test
   public void testLinkDroneWithService() {
-    HiveMindLinkManager testLink = new HiveMindLinkManager();
-
-    DroneTelemetryStore testStore = new DroneTelemetryStore();
-
-    HiveCodeManager testCodeManager =
+      HiveCodeManager testCode =
             new HiveCodeManager() {
               @Override
               public String generateHiveCode(UUID droneUUID, UUID ownerUUID) {
                 return "D-123";
               }
-          };
+            };
+
+      HiveMindLinkManager testLink =
+              new HiveMindLinkManager() {
+                  boolean linked = false;
+
+                  @Override
+                  public void linkDroneToOwner(UUID droneUUID, UUID ownerUUID) {
+                      linked = true;
+                      super.linkDroneToOwner(droneUUID, ownerUUID);
+                  }
+              };
+
+      DroneTelemetryStore testTelemetry =
+              new DroneTelemetryStore() {
+                  public boolean updated = false;
+
+                  @Override
+                  public void updateDroneData(
+                          UUID droneUUID,
+                          UUID ownerUUID,
+                          double x,
+                          double y,
+                          double z,
+                          String dimensionKey,
+                          double health,
+                          double maxHealth) {
+                      this.updated = true;
+                      super.updateDroneData(droneUUID, ownerUUID, x, y, z, dimensionKey, health, maxHealth);
+                  }
+              };
 
     HiveMindService testService =
             new HiveMindService() {
         @Override
-              public HiveMindService getLinkManager(MinecraftServer server) {
+              public HiveMindLinkManager getLinkManager(MinecraftServer server) {
                 return testLink;
               }
 
               @Override
                 public DroneTelemetryStore getTelemetryStore(MinecraftServer server) {
-            return testStore;
+            return testTelemetry;
               }
 
               @Override
@@ -69,48 +94,10 @@ public class DroneLinkUtilsTest {
                     testService, drone, owner, 1.0, 2.0, 3.0, "overworld",
                     10.0, 20.0);
 
-    assertEquals("D-123", code);
-    assertTrue(testLink.isDroneLinked(drone));
-    assertNotNull(testStore.getDroneData(drone));
-
-    HiveCodeManager testCode =
-            new HiveCodeManager() {
-          @Override
-          public String generateHiveCode(UUID droneUUID, UUID ownerUUID) {
-            return "D-123";
-          }
-        };
-
-    HiveMindService testService =
-        new HiveMindService() {
-          @Override
-          public HiveMindLinkManager getLinkManager(MinecraftServer server) {
-            return testLink;
-          }
-
-          @Override
-          public DroneTelemetryStore getTelemetryStore(MinecraftServer server) {
-            return testStore;
-          }
-
-          @Override
-          public HiveCodeManager getHiveCodeManager(MinecraftServer server) {
-            return testCode;
-          }
-        };
-
-    HiveMindServiceManager.setProvider(testService);
-
-    UUID drone = UUID.randomUUID();
-    UUID owner = UUID.randomUUID();
-
-    String code =
-        DroneLinkUtils.linkDroneWithService(
-            testService, drone, owner, 1.0, 2.0, 3.0, "overworld", 10.0, 20.0);
 
     assertEquals("D-123", code);
     assertTrue(testLink.isDroneLinked(drone));
-    assertNotNull(testStore.getDroneData(drone));
+    assertNotNull(testTelemetry.getDroneData(drone));
   }
 
   @Test

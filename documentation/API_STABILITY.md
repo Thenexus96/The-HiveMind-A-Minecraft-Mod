@@ -325,7 +325,7 @@ if (data.contains("old_format")) {
 
 ### Known Breaking Changes (Future)
 
-None currently planned. See `docs/roadmap/` for future phases.
+None currently planned. See `documentation/roadmap/` for future phases.
 
 ### Phases
 
@@ -452,7 +452,5 @@ dependencies {
 ## References
 
 - **Semantic Versioning**: https://semver.org/
-- **Java Deprecation**: https://docs.oracle.com/javase/9/docs/api/java/lang/Deprecated.html
+- **Java Deprecation**: https://docs.oracle.com/javase/9/documentation/api/java/lang/Deprecated.html
 - **API Evolution**: https://cr.openjdk.org/~darcy/patterns/P.005.html
-
-

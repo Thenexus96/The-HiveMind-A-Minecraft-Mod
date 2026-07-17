@@ -17,7 +17,7 @@ Implement Debug Mode, create the base progression/research skeleton, implement p
 ### A. Debug Mode (Primary — 3 days)
 - Implement `DebugMode` class and keybind/command registration
 - HUD overlay: shows hovered entity id, role, health, owner, hive id
-- Console command `hivemind_debug` to toggle and dump selected entity data
+- Console subcommand `hive debug` to toggle and dump selected entity data (e.g., `/hive debug toggle`, `/hive debug dump`)
 - Visual link rendering for hive nodes (basic lines between nodes)
 - Tests: integration test that toggles Debug Mode and verifies HUD state
 
@@ -50,8 +50,8 @@ Owner: Developer C
 Owner: Developer A
 
 ### E. Documentation & Debugging tools (Ongoing)
-- Update `docs/DESIGN_DECISIONS.md` (done)
-- Add Debug Mode usage to `docs/QUICK_START.md`
+- Update `documentation/DESIGN_DECISIONS.md` (done)
+- Add Debug Mode usage to `documentation/QUICK_START.md`
 - Add server config options to `gradle.properties` or a config template
 
 Owner: Developer Docs
@@ -59,7 +59,7 @@ Owner: Developer Docs
 ## Deliverables
 - Source files: `HiveManager`, `Hive` serialization, `DebugMode`, `DroneRole` interface (skeleton), `Node` prototype
 - Tests: unit + integration tests described above
-- Docs: Sprint notes in `docs/roadmap/phase2-sprint1.md` and usage in `docs/QUICK_START.md`
+- Docs: Sprint notes in `documentation/roadmap/phase2-sprint1.md` and usage in `documentation/QUICK_START.md`
 
 ## Risks & Mitigation
 - Pathfinding & AI cost: mitigate by keeping simulation frequency low for prototype and using LOD
@@ -68,5 +68,3 @@ Owner: Developer Docs
 ## Next steps after Sprint 1
 - Sprint 2: Drone roles baseline, combat tuning, integrate progression bonuses into drone behavior
 - Sprint 3: Performance profiling, load-testing and optimization
-
-

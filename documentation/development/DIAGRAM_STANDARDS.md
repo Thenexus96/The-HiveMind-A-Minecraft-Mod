@@ -234,13 +234,13 @@ Example:
 Architecture diagram:
 
 ```text
-docs/01_Architecture/
+documentation/architecture/
 ```
 
 Specification diagram:
 
 ```text
-docs/02_Specifications/
+documentation/specs/
 ```
 
 ---

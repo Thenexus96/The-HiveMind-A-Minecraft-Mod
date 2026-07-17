@@ -501,6 +501,4 @@ Quality checks add ~2-3 minutes to builds.
 - **Spotless issues**: See `spotless` block in `build.gradle`
 - **Checkstyle issues**: Edit `checkstyle.xml` or review report
 - **SpotBugs issues**: Edit `spotbugs-exclude.xml` or investigate bug
-- **General CI**: See `docs/GITEA_CI.md` or `docs/CI.md`
-
-
+- **General CI**: See `documentation/GITEA_CI.md` or `documentation/CI.md`

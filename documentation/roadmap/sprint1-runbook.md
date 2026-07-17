@@ -33,7 +33,7 @@ Acceptance criteria (Definition of Done)
 1. **Debug Mode** (Task A)
   - ✅ Implemented `DebugMode` class with toggle and overlay
   - ✅ HUD overlay shows hovered entity id, role, health, owner, hive id
-  - ✅ Console command `/hivemind_debug` for toggle and dump
+  - ✅ Console subcommand `/hive debug` for toggle and dump (e.g. `/hive debug toggle`, `/hive debug dump`)
   - ✅ Dump command lists all drones with roles
   - ✅ 11 unit tests passing
   - Files: `DebugCommands.java`, `DebugKeyBindings.java`, `DroneDebugOverlay.java`
@@ -48,12 +48,21 @@ Acceptance criteria (Definition of Done)
   - ✅ 11 unit tests passing (Hive serialization, member ops, resource ops)
   - Files: `Hive.java`, `HiveManager.java`, `HiveTest.java`
 
-### In Progress 🔄
+### Completed ✅
 
 3. **Progression / Research Skeleton** (Task C)
-  - 🔄 Starting implementation
-  - Need: Node model, Cost model, Effect model, unlock API, sample +5% soldier damage node
-  - Estimated 1 day to complete
+  - ✅ Implemented ResearchNode model, ResearchManager registry, and unlock flow
+  - ✅ Server-side command `/hive research unlock <nodeId>` to unlock a node for the owner's hive
+  - ✅ Sample node: `soldier_damage_1` (+5% soldier damage)
+  - ✅ Unit test verifying unlock writes the effect into the Hive research state
+  - Files: `ResearchNode.java`, `ResearchManager.java`, `ResearchCommands.java`, `ResearchTest.java`
+
+### In Progress 🔄
+
+4. **Node Claiming & Resource Flow** (Task D)
+  - 🔄 Now in progress — depends on research unlock patterns
+  - Need: Node entity/tile, claim mechanic, resource increment
+  - Estimated 2-3 days to complete
 
 ### Pending ⏳
 
@@ -74,7 +83,7 @@ Important paths
  - Project root: repository top-level
  - Run data (dev client/server worlds): `run/`
  - Dev server config: `run/config/` (create `hivemind.json` if not present)
- - Docs for this sprint: `docs/roadmap/phase2-sprint1.md` and this runbook
+ - Docs for this sprint: `documentation/roadmap/phase2-sprint1.md` and this runbook
 
 Core commands (PowerShell / Windows)
 Use PowerShell at project root; prefer the Gradle wrapper to ensure reproducible builds.
@@ -109,8 +118,8 @@ docker run --rm -v "${PWD}:/workspace" -w /workspace gradle:8.3-jdk17 bash -lc "
 ```
 
 Debug Mode usage (developer tools)
- - Toggle in-game via provided command: `/hivemind_debug toggle` (server-op required).
- - Dump state: `/hivemind_debug dump` — writes HiveManager snapshot to `run/logs/hivemind-dump-<timestamp>.log` and to server log.
+ - Toggle in-game via provided command: `/hive debug toggle` (server-op required).
+ - Dump state: `/hive debug dump` — writes HiveManager snapshot to `run/logs/hivemind-dump-<timestamp>.log` and to server log.
  - If you need a persistent default, create `run/config/hivemind.json` (example below).
 
 Example `run/config/hivemind.json`
@@ -135,8 +144,8 @@ PR checklist (add to PR description)
  - [ ] Added/updated unit tests covering new code (happy path)
  - [ ] All Gradle checks pass locally: `spotlessCheck`, `test`, `checkstyleMain`, `spotbugsMain`
  - [ ] Implementation matches acceptance criteria for its task
- - [ ] Updated docs: add any new developer-facing commands or config options to `docs/QUICK_START.md` or this runbook
- - [ ] Link to design decisions if applicable (`docs/DESIGN_DECISIONS.md`)
+ - [ ] Updated docs: add any new developer-facing commands or config options to `documentation/QUICK_START.md` or this runbook
+ - [ ] Link to design decisions if applicable (`documentation/DESIGN_DECISIONS.md`)
 
 Task breakdown and owners (suggested)
  - Debug Mode (overlay + commands) — owner: @frontend-dev
@@ -153,7 +162,7 @@ Task breakdown and owners (suggested)
 How to run the sprint acceptance test locally (quick smoke)
  1. Start `runServer` in one terminal: `.\gradlew.bat runServer`.
  2. Start `runClient` in a second terminal or launch from IDE and join the local server.
- 3. Toggle debug mode: `/hivemind_debug toggle` (verify server log shows state change).
+ 3. Toggle debug mode: `/hive debug toggle` (verify server log shows state change).
  4. Create a Hive via the provided API/command or use the code path under test.
  5. Claim a sample node and verify the Hive's resources increased and persisted after server restart.
 
@@ -176,9 +185,9 @@ Next steps after Sprint 1
  - Start performance profiling to determine safe default limits and LOD tuning.
 
 References
- - `docs/roadmap/phase2-sprint1.md` — sprint plan and tasks
- - `docs/DESIGN_DECISIONS.md` — architecture decisions for Phase 2
- - `docs/QUICK_START.md` — developer quick start
+ - `documentation/roadmap/phase2-sprint1.md` — sprint plan and tasks
+ - `documentation/DESIGN_DECISIONS.md` — architecture decisions for Phase 2
+ - `documentation/QUICK_START.md` — developer quick start
 
 ---
 
@@ -187,4 +196,3 @@ If you want, I can also:
  - Add a small PR template file under `.gitea/PR_TEMPLATE.md` and update `CONTRIBUTING.md` to reference it.
 
 End of runbook.
-

@@ -59,10 +59,9 @@ Prototype & Sprint Plan
 
 Files to update during work
 - `src/main/java/...` — new DebugMode classes, Drone role classes, Hive ownership manager
-- `docs/DESIGN_DECISIONS.md` — capture decisions, server/client trade-offs, API notes
-- `docs/roadmap/phase2-sprint1.md` — sprint tasks and owners
+- `documentation/DESIGN_DECISIONS.md` — capture decisions, server/client trade-offs, API notes
+- `documentation/roadmap/phase2-sprint1.md` — sprint tasks and owners
 
 First internal prototype test
 - Run a dedicated test world with Debug Mode enabled
 - Verify node claiming and resource flow prototype
-

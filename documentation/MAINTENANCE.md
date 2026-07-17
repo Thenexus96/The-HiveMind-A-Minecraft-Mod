@@ -51,8 +51,8 @@ Use Gradle's built-in tasks to identify unused or conflicting dependencies:
 
 ## 5. Documentation and Roadmap Maintenance
 
-- Update `docs/roadmap/` with milestone progress and upcoming features.
-- Link maintainers to `docs/CI.md` and `docs/MAINTENANCE.md` in `README.md`.
+- Update `documentation/roadmap/` with milestone progress and upcoming features.
+- Link maintainers to `documentation/CI.md` and `documentation/MAINTENANCE.md` in `README.md`.
 - Keep `CONTRIBUTING.md` current with the latest development practices.
 
 ## 6. CI Automation
@@ -110,5 +110,3 @@ If you want to implement additional automation or cleanup:
    - Dismiss stale PR approvals.
 
 Contact the maintainers if you want help with any of these tasks.
-
-

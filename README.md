@@ -2,9 +2,9 @@
 
 **A Minecraft mod for controlling drone entities through a neural hive network**
 
-[![Build Status](badge-url)](link)
-[![License](badge)](license-link)
-[![Minecraft Version](badge)](version)
+- **Status:** Active development
+- **Minecraft:** 1.20.1
+- **Loader:** Fabric
 
 ## 🎮 About
 
@@ -22,9 +22,9 @@ and directly possess drones to extend your reach in the Minecraft world.
 
 ## 📦 Installation
 
-1. Download the latest release from [Releases](releases-link)
-2. Install [Fabric Loader](fabric-link) for Minecraft 1.20.1
-3. Install [Fabric API](fabric-api-link)
+1. Build the project locally, or obtain a release when one is published.
+2. Install Fabric Loader for Minecraft 1.20.1.
+3. Install Fabric API compatible with the selected Minecraft version.
 4. Place the mod JAR in your `mods` folder
 5. Launch Minecraft
 
@@ -79,11 +79,11 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for gu
 
 ## 🐛 Bug Reports
 
-Found a bug? Please [open an issue](issues-link) using the bug report template.
+Found a bug? Use the repository's bug-report template in `.github/ISSUE_TEMPLATE/bug_report.md`.
 
 ## 📜 License
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+A license file is not currently present in the repository. Do not distribute or reuse the project under an assumed license; add an explicit license before publishing releases.
 
 ## 🙏 Acknowledgments
 

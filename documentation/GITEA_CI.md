@@ -1,6 +1,6 @@
 # Gitea CI/CD Guide — HiveMind
 
-This guide is optimized for **Gitea self-hosted runners** (your primary platform). If you also use GitHub, see `docs/CI.md` for GitHub Actions guidance.
+This guide is optimized for **Gitea self-hosted runners** (your primary platform). If you also use GitHub, see `documentation/CI.md` for GitHub Actions guidance.
 
 ## Overview
 
@@ -374,6 +374,5 @@ A: ~10GB minimum. Docker caches images (~2GB), Gradle cache (~1-3GB), build outp
 
 ---
 
-**For GitHub Actions guidance**, see `docs/CI.md`  
-**For general CI questions**, see `docs/REPO_CLEANUP_SUMMARY.md`
-
+**For GitHub Actions guidance**, see `documentation/CI.md`
+**For general CI questions**, see `documentation/REPO_CLEANUP_SUMMARY.md`

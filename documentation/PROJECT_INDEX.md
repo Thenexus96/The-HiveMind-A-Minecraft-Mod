@@ -28,39 +28,33 @@ The goal is to ensure that the project remains understandable, maintainable, and
 
 ---
 
-# Project Structure
+# Current Repository Structure
+
+The structure below is the authoritative current layout. Earlier planning documents may use a numbered `docs/` hierarchy; that hierarchy is a planning model, not a filesystem map for this repository.
 
 ```text
-LivingSystemsProject/
+The-HiveMind-A-Minecraft-Mod/
 
 ├── README.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 │
-├── docs/
+├── documentation/
 │
 │   ├── 00_Project/
-│   │
-│   ├── 01_Architecture/
-│   │
-│   ├── 02_Specifications/
-│   │
-│   ├── 03_Development/
-│   │
-│   ├── 04_History/
-│   │
-│   ├── 05_Roadmap/
-│   │
-│   ├── 06_Reference/
-│   │
-│   ├── 07_Platform/
-│   │
-│   └── 08_HiveMind/
+│   ├── architecture/
+│   ├── specs/
+│   ├── development/
+│   ├── history/
+│   ├── roadmap/
+│   ├── reference/
+│   ├── wiki/
+│   └── design/
 │
-└── modules/
-
-    └── HiveMind/
+└── src/
 ```
+
+See [DOCUMENTATION_GAP_REGISTER.md](DOCUMENTATION_GAP_REGISTER.md) for planned document categories that have not yet been created because their underlying systems are not implemented or approved.
 
 ---
 

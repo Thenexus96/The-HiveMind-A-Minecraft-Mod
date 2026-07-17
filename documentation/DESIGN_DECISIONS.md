@@ -107,7 +107,7 @@ Server vs Client trade-offs
 Implementation recommendations
 - Start with conservative defaults.
 - Provide built-in LOD and interest management before enabling large counts.
-- Document server/client trade-offs clearly in `docs/CODE_QUALITY.md` and `docs/GITEA_CI.md`.
+- Document server/client trade-offs clearly in `documentation/CODE_QUALITY.md` and `documentation/GITEA_CI.md`.
 
 ## Migration & Backwards Compatibility
 - Hive data format: include versioning in NBT so older/newer versions can detect and migrate.
@@ -125,5 +125,4 @@ Implementation recommendations
 
 Recorded by: implementation notes (July 2, 2026)
 
-Refer to sprint plan: `docs/roadmap/phase2-sprint1.md` for task breakdown and owners.
-
+Refer to sprint plan: `documentation/roadmap/phase2-sprint1.md` for task breakdown and owners.
