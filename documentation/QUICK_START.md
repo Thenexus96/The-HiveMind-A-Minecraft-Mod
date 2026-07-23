@@ -39,8 +39,8 @@ Or manually:
 - Read: [Contributing Guidelines](../CONTRIBUTING.md)
 
 ### 🏗️ Understand the architecture
-- Read: [Architecture Design](design/architecture.md)
-- Read: [Data Flow Diagram](design/data-flow.md)
+- Read: [Architecture Design](archive/design/architecture.md)
+- Read: [Data Flow Diagram](archive/design/data-flow.md)
 - Read: [API Documentation](wiki/API-Documentation.md)
 
 ### 📊 Check project progress
@@ -48,7 +48,7 @@ Or manually:
 - Read: [Phase 2 Details](roadmap/phase-2-drone-framework.md)
 
 ### 📚 Understand what was recently done
-- Read: [Repository Cleanup Summary](REPO_CLEANUP_SUMMARY.md)
+- Read: [Repository Cleanup Summary](archive/REPO_CLEANUP_SUMMARY.md)
 
 ---
 

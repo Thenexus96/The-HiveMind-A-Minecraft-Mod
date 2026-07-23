@@ -13,20 +13,20 @@
 - ✅ `docs/QUICK_START.md` (106 lines) - Quick reference for developers
 
 ### CI/CD Workflows
-- ✅ `.github/workflows/build.yml` (updated, 51 lines) - Main build pipeline
-- ✅ `.github/workflows/qodana_code_quality.yml` (updated, 39 lines) - Code quality scanning
-- ✅ `.github/workflows/integration-test.yml` (40 lines) - Integration test pipeline
-- ✅ `.github/dependabot.yml` (29 lines) - Automated dependency updates
-- ✅ `.gitea/workflows/ci.yml` (updated, 47 lines) - Gitea CI pipeline
-- ✅ `.gitea/workflows/build.yml` (updated, 42 lines) - Gitea build pipeline
+- ✅ `../../.github/workflows/build.yml` (updated, 51 lines) - Main build pipeline
+- ✅ `../../.github/workflows/qodana_code_quality.yml` (updated, 39 lines) - Code quality scanning
+- ✅ `../../.github/workflows/integration-test.yml` (40 lines) - Integration test pipeline
+- ✅ `../../.github/dependabot.yml` (29 lines) - Automated dependency updates
+- ✅ `../../.gitea/workflows/ci.yml` (updated, 47 lines) - Gitea CI pipeline
+- ✅ `../../.gitea/workflows/build.yml` (updated, 42 lines) - Gitea build pipeline
 
 ### Scripts
-- ✅ `scripts/check-ci.sh` (50 lines) - Local CI check helper
+- ✅ `../../scripts/check-ci.sh` (50 lines) - Local CI check helper
 
 ### Configuration Files Updated
-- ✅ `.gitignore` (updated) - Added `/logs/` entry
-- ✅ `CONTRIBUTING.md` (updated) - Added CI & PR checks section with script reference
-- ✅ `README.md` (updated) - Added links to CI, Maintenance, and Summary docs
+- ✅ `../../.gitignore` (updated) - Added `/logs/` entry
+- ✅ `../../CONTRIBUTING.md` (updated) - Added CI & PR checks section with script reference
+- ✅ `../../README.md` (updated) - Added links to CI, Maintenance, and Summary docs
 
 ---
 
@@ -56,7 +56,7 @@
 - ✅ Runs on `main` pushes and PRs to `main`
 - ✅ Manual trigger via `workflow_dispatch`
 - ✅ Test result artifact uploads
-- ✅ Works with existing `src/integrationTest/` setup
+- ✅ Works with existing `../../src/integrationTest` setup
 
 **Gitea Workflows**
 - ✅ Standardized to match GitHub Actions behavior
@@ -73,7 +73,7 @@
 
 ### Developer Tools
 
-**Local CI Check Script** (`scripts/check-ci.sh`)
+**Local CI Check Script** (`../../scripts/check-ci.sh`)
 - ✅ Runs tests and build with same flags as CI
 - ✅ Color-coded output for easy reading
 - ✅ Pass/fail counter
@@ -87,7 +87,7 @@
 - ✅ `docs/MAINTENANCE.md` - Cleanup tasks, dependency hygiene, scheduled tasks
 - ✅ `docs/REPO_CLEANUP_SUMMARY.md` - Complete change log and reference
 - ✅ `docs/QUICK_START.md` - Quick navigation for common tasks
-- ✅ `CONTRIBUTING.md` - Updated with CI requirements and script reference
+- ✅ `../../CONTRIBUTING.md` - Updated with CI requirements and script reference
 
 ---
 
@@ -114,7 +114,7 @@ chmod +x scripts/check-ci.sh
 ### CI Testing
 
 **After pushing to repository**:
-1. ✅ GitHub Actions `.github/workflows/build.yml` will run automatically
+1. ✅ GitHub Actions `../../.github/workflows/build.yml` will run automatically
 2. ✅ Integration tests will run on `main` branch
 3. ✅ Qodana scan will run (if token is configured)
 4. ✅ Dependabot will check for updates (first run on Monday)
@@ -129,7 +129,7 @@ chmod +x scripts/check-ci.sh
 
 ### Dependabot (Already Configured)
 - Will automatically start checking for updates on Monday
-- Configure in `.github/dependabot.yml` if needed
+- Configure in `../../.github/dependabot.yml` if needed
 - Can be manually triggered from Insights > Dependency graph
 
 ---
@@ -193,12 +193,12 @@ chmod +x scripts/check-ci.sh
 - `docs/REPO_CLEANUP_SUMMARY.md` - Complete change log
 
 ### Implementation Details
-- `.github/workflows/build.yml` - Main GitHub Actions build
-- `.github/workflows/qodana_code_quality.yml` - Code quality workflow
-- `.github/workflows/integration-test.yml` - Integration test workflow
-- `.github/dependabot.yml` - Dependency automation
-- `scripts/check-ci.sh` - Local CI check script
-- `CONTRIBUTING.md` - Contributor guidelines
+- `../../.github/workflows/build.yml` - Main GitHub Actions build
+- `../../.github/workflows/qodana_code_quality.yml` - Code quality workflow
+- `../../.github/workflows/integration-test.yml` - Integration test workflow
+- `../../.github/dependabot.yml` - Dependency automation
+- `../../scripts/check-ci.sh` - Local CI check script
+- `../../CONTRIBUTING.md` - Contributor guidelines
 
 ---
 

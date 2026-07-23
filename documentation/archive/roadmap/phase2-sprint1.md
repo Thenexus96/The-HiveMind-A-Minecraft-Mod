@@ -50,16 +50,16 @@ Owner: Developer C
 Owner: Developer A
 
 ### E. Documentation & Debugging tools (Ongoing)
-- Update `documentation/DESIGN_DECISIONS.md` (done)
-- Add Debug Mode usage to `documentation/QUICK_START.md`
-- Add server config options to `gradle.properties` or a config template
+- Update `../../DESIGN_DECISIONS.md` (done)
+- Add Debug Mode usage to `../../QUICK_START.md`
+- Add server config options to `../../../gradle.properties` or a config template
 
 Owner: Developer Docs
 
 ## Deliverables
 - Source files: `HiveManager`, `Hive` serialization, `DebugMode`, `DroneRole` interface (skeleton), `Node` prototype
 - Tests: unit + integration tests described above
-- Docs: Sprint notes in `documentation/roadmap/phase2-sprint1.md` and usage in `documentation/QUICK_START.md`
+- Docs: Sprint notes in `documentation/roadmap/phase2-sprint1.md` and usage in `../../QUICK_START.md`
 
 ## Risks & Mitigation
 - Pathfinding & AI cost: mitigate by keeping simulation frequency low for prototype and using LOD

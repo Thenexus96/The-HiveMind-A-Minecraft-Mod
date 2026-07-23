@@ -219,6 +219,6 @@ Before making significant decisions, ask:
 
 ## Reference
 
-- **Roadmap**: `documentation/ROADMAP.md`
+- **Roadmap**: `archive/ROADMAP.md`
 - **API Stability**: `documentation/API_STABILITY.md`
 - **Contributing**: `CONTRIBUTING.md`

@@ -14,7 +14,7 @@ All four major initiatives have been successfully implemented:
 |---|-----------|--------|---------------|---------|
 | **1** | Static Analysis & Code Quality | ✅ Complete | `docs/CODE_QUALITY.md` | `./gradlew spotlessCheck` |
 | **2** | Release & Version Management | ✅ Complete | `docs/RELEASE.md` | `./scripts/version-bump.sh` |
-| **3** | API Stability & Backward Compatibility | ✅ Complete | `docs/API_STABILITY.md` | `gradle.properties` |
+| **3** | API Stability & Backward Compatibility | ✅ Complete | `docs/API_STABILITY.md` | `../../gradle.properties` |
 | **4** | Roadmap & Feature Planning | ✅ Complete | `docs/ROADMAP.md` + phases | `docs/roadmap/*.md` |
 
 ---
@@ -23,18 +23,18 @@ All four major initiatives have been successfully implemented:
 
 ### What's Implemented
 
-**Code Quality Tools** (all configured in `build.gradle`):
+**Code Quality Tools** (all configured in `../../build.gradle`):
 - ✅ **Spotless** (v6.25.0) — Code formatting with Google Java Style
 - ✅ **Checkstyle** (v10.12.7) — Style rules enforcement
 - ✅ **SpotBugs** (v6.0.14) — Bug detection
 
 **Configuration Files**:
-- ✅ `build.gradle` — Quality tool configuration
-- ✅ `checkstyle.xml` — Style rules (100 char line limit, naming conventions)
-- ✅ `spotbugs-exclude.xml` — False positive exclusions
+- ✅ `../../build.gradle` — Quality tool configuration
+- ✅ `../../checkstyle.xml` — Style rules (100 char line limit, naming conventions)
+- ✅ `../../spotbugs-exclude.xml` — False positive exclusions
 
 **Pre-Commit Hook**:
-- ✅ `scripts/pre-commit-hook.sh` — Auto-run checks before commits
+- ✅ `../../scripts/pre-commit-hook.sh` — Auto-run checks before commits
 
 ### Quick Commands
 
@@ -72,7 +72,7 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit
 ### What's Implemented
 
 **Version Format**: `MAJOR.MINOR.PATCH[-PRERELEASE]+MINECRAFT_VERSION`  
-**Current Version**: `0.2.0-alpha+1.20.1` (in `gradle.properties`)
+**Current Version**: `0.2.0-alpha+1.20.1` (in `../../gradle.properties`)
 
 **Versioning Strategy**:
 - ✅ Semantic versioning with Minecraft suffix
@@ -81,7 +81,7 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit
 - ✅ MAJOR (0 → 1): Breaking changes
 
 **Release Workflow**:
-1. Update `CHANGELOG.md`
+1. Update `../../CHANGELOG.md`
 2. Bump version with script
 3. Create release tag
 4. Build release JAR
@@ -89,8 +89,8 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit
 
 **Automation Scripts**:
 - ✅ `./scripts/version-bump.sh [version] [minecraft-version]`
-  - Updates `gradle.properties`
-  - Updates `README.md` version line
+  - Updates `../../gradle.properties`
+  - Updates `../../README.md` version line
   - Shows confirmation and next steps
 
 ### Quick Commands
@@ -260,32 +260,32 @@ public String oldMethod() { ... }
 - ✅ `docs/roadmap/*.md` (4 phase documents)
 
 ### CI/CD Workflows (8 files)
-- ✅ `.github/workflows/build.yml` — GitHub Actions build
-- ✅ `.github/workflows/qodana_code_quality.yml` — Code quality
-- ✅ `.github/workflows/integration-test.yml` — Integration tests
-- ✅ `.gitea/workflows/ci.yml` — Gitea primary CI
-- ✅ `.gitea/workflows/ci-advanced.yml` — Optional advanced
-- ✅ `.gitea/workflows/build.yml` — Legacy
-- ✅ `.gitea/workflows/build-split.yml` — Legacy
-- ✅ `.gitea/workflows/qodana_code_quality.yml` — Code quality
+- ✅ `../../.github/workflows/build.yml` — GitHub Actions build
+- ✅ `../../.github/workflows/qodana_code_quality.yml` — Code quality
+- ✅ `../../.github/workflows/integration-test.yml` — Integration tests
+- ✅ `../../.gitea/workflows/ci.yml` — Gitea primary CI
+- ✅ `../../.gitea/workflows/ci-advanced.yml` — Optional advanced
+- ✅ `../../.gitea/workflows/build.yml` — Legacy
+- ✅ `../../.gitea/workflows/build-split.yml` — Legacy
+- ✅ `../../.gitea/workflows/qodana_code_quality.yml` — Code quality
 
 ### Scripts (3 files)
-- ✅ `scripts/check-ci.sh` — Local CI simulation
-- ✅ `scripts/version-bump.sh` — Automated version bumping
-- ✅ `scripts/pre-commit-hook.sh` — Pre-commit quality checks
+- ✅ `../../scripts/check-ci.sh` — Local CI simulation
+- ✅ `../../scripts/version-bump.sh` — Automated version bumping
+- ✅ `../../scripts/pre-commit-hook.sh` — Pre-commit quality checks
 
 ### Configuration (6 files)
-- ✅ `build.gradle` — Spotless, Checkstyle, SpotBugs config
-- ✅ `gradle.properties` — Version and dependencies
-- ✅ `checkstyle.xml` — Style rules
-- ✅ `spotbugs-exclude.xml` — Bug detection exclusions
-- ✅ `qodana.yaml` — Code quality scanning
-- ✅ `.gitignore` — Build artifact exclusions
+- ✅ `../../build.gradle` — Spotless, Checkstyle, SpotBugs config
+- ✅ `../../gradle.properties` — Version and dependencies
+- ✅ `../../checkstyle.xml` — Style rules
+- ✅ `../../spotbugs-exclude.xml` — Bug detection exclusions
+- ✅ `../../qodana.yaml` — Code quality scanning
+- ✅ `../../.gitignore` — Build artifact exclusions
 
 ### Project Files Updated (3 files)
-- ✅ `README.md` — Links to new docs
-- ✅ `CONTRIBUTING.md` — CI requirements added
-- ✅ `CHANGELOG.md` — Release tracking
+- ✅ `../../README.md` — Links to new docs
+- ✅ `../../CONTRIBUTING.md` — CI requirements added
+- ✅ `../../CHANGELOG.md` — Release tracking
 
 ---
 
@@ -322,7 +322,7 @@ docs/CODE_QUALITY.md          # Code quality
 
 ### Release Workflow (Per Release)
 
-1. **Update changelog**: Edit `CHANGELOG.md`
+1. **Update changelog**: Edit `../../CHANGELOG.md`
 2. **Bump version**: `./scripts/version-bump.sh 0.3.0`
 3. **Create tag**: `git tag -a v0.3.0 -m "Release v0.3.0"`
 4. **Push tag**: `git push origin v0.3.0`
@@ -389,7 +389,7 @@ docs/CODE_QUALITY.md          # Code quality
 All items verified ✅:
 
 - [x] All 4 documentation files exist and complete
-- [x] All quality tools configured in `build.gradle`
+- [x] All quality tools configured in `../../build.gradle`
 - [x] All configuration files present (checkstyle.xml, spotbugs-exclude.xml)
 - [x] All 3 scripts created and working (check-ci.sh, version-bump.sh, pre-commit-hook.sh)
 - [x] GitHub Actions workflows in place (3 files)
@@ -429,8 +429,8 @@ All items verified ✅:
 ```
 
 **View reports**:
-- Checkstyle: `build/reports/checkstyle/main.html`
-- SpotBugs: `build/reports/spotbugs/main.html`
+- Checkstyle: `../../build/reports/checkstyle/main.html`
+- SpotBugs: `../../build/reports/spotbugs/main.html`
 
 ### 2. Version Management
 

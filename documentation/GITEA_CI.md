@@ -375,4 +375,4 @@ A: ~10GB minimum. Docker caches images (~2GB), Gradle cache (~1-3GB), build outp
 ---
 
 **For GitHub Actions guidance**, see `documentation/CI.md`
-**For general CI questions**, see `documentation/REPO_CLEANUP_SUMMARY.md`
+**For general CI questions**, see `archive/REPO_CLEANUP_SUMMARY.md`

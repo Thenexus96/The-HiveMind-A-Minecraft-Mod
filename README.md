@@ -39,7 +39,7 @@ and directly possess drones to extend your reach in the Minecraft world.
 
 **Start Here**:
 - [🚀 Quick Start Guide](documentation/QUICK_START.md) — Navigation for all docs
-- [✅ Implementation Complete](documentation/IMPLEMENTATION_COMPLETE.md) — Summary of all implementations
+- [✅ Implementation Complete](documentation/archive/IMPLEMENTATION_COMPLETE.md) — Summary of all implementations
 
 **Development & CI**:
 - [Gitea CI/CD Guide](documentation/GITEA_CI.md) (Primary — Recommended First Read)
@@ -51,7 +51,7 @@ and directly possess drones to extend your reach in the Minecraft world.
 - [API Stability & Backward Compatibility](documentation/API_STABILITY.md)
 
 **Planning & Roadmap**:
-- [Project Roadmap & Feature Planning](documentation/ROADMAP.md)
+- [Project Roadmap & Feature Planning](documentation/archive/ROADMAP.md)
 - [Technical Decision Process](documentation/DECISION_PROCESS.md)
 
 **Project Docs**:

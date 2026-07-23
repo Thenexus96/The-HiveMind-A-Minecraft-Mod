@@ -12,7 +12,7 @@ The repository has been improved with:
 2. **Automated Testing** - Unit tests, integration tests, and Qodana code quality scanning.
 3. **Dependency Management** - Dependabot automation for weekly dependency updates.
 4. **Developer Tools** - Local CI check script and comprehensive documentation.
-5. **Repository Hygiene** - Updated `.gitignore` and added maintenance guides.
+5. **Repository Hygiene** - Updated `../../.gitignore` and added maintenance guides.
 
 ---
 
@@ -22,7 +22,7 @@ The repository has been improved with:
 
 #### GitHub Actions (Primary)
 
-**File**: `.github/workflows/build.yml`
+**File**: `../../.github/workflows/build.yml`
 - ✅ Added Gradle cache via `actions/setup-java@v4` with `cache: gradle`
 - ✅ Added fallback Gradle cache using `actions/cache@v4`
 - ✅ Added explicit unit test step: `./gradlew test`
@@ -30,20 +30,20 @@ The repository has been improved with:
 - ✅ Restricted artifact uploads to `main` branch and tags only (reduces PR clutter)
 - ✅ Updated to `actions/checkout@v3` and `actions/setup-java@v4`
 
-**File**: `.github/workflows/qodana_code_quality.yml`
+**File**: `../../.github/workflows/qodana_code_quality.yml`
 - ✅ Fixed checkout to handle all event types (PR and push) robustly
 - ✅ Dynamically set `pr-mode` based on event type: `pr-mode: ${{ github.event_name == 'pull_request' }}`
 - ✅ Enabled SARIF result upload: `upload-result: true`
 - ✅ Extended branches to include `main` in addition to `creation`
 - ✅ Updated to `actions/checkout@v4`
 
-**File**: `.github/workflows/integration-test.yml` (NEW)
+**File**: `../../.github/workflows/integration-test.yml` (NEW)
 - ✅ Created dedicated integration test workflow
 - ✅ Triggers: `push` to `main`, `pull_request` to `main`, and manual `workflow_dispatch`
 - ✅ Runs: `./gradlew integrationTest -PintegrationTest --stacktrace`
 - ✅ Uploads test results as artifacts
 
-**File**: `.github/dependabot.yml` (NEW)
+**File**: `../../.github/dependabot.yml` (NEW)
 - ✅ Configured automated Gradle dependency updates
 - ✅ Schedule: Weekly on Mondays at 04:00 UTC
 - ✅ Limit: 5 open PRs at a time
@@ -52,12 +52,12 @@ The repository has been improved with:
 
 #### Gitea Workflows (Standardized)
 
-**File**: `.gitea/workflows/ci.yml`
+**File**: `../../.gitea/workflows/ci.yml`
 - ✅ Added unit test step: `./gradlew test`
 - ✅ Made Gradle calls reproducible with standard flags
 - ✅ Updated archive handling and reporting
 
-**File**: `.gitea/workflows/build.yml`
+**File**: `../../.gitea/workflows/build.yml`
 - ✅ Added Gradle cache support
 - ✅ Added unit test step
 - ✅ Updated to `actions/setup-java@v4` and `actions/upload-artifact@v4`
@@ -65,7 +65,7 @@ The repository has been improved with:
 
 ### 2. Developer Tools
 
-**File**: `scripts/check-ci.sh` (NEW)
+**File**: `../../scripts/check-ci.sh` (NEW)
 - ✅ Bash script for local CI validation
 - ✅ Runs: unit tests and build with same flags as CI
 - ✅ Color-coded output (green/yellow/red)
@@ -95,18 +95,18 @@ The repository has been improved with:
 - ✅ Scheduled maintenance task recommendations
 - ✅ Local development cleanup tips
 
-**File**: `CONTRIBUTING.md` (UPDATED)
+**File**: `../../CONTRIBUTING.md` (UPDATED)
 - ✅ Added "CI & PR checks" section
-- ✅ Reference to `scripts/check-ci.sh` helper
+- ✅ Reference to `../../scripts/check-ci.sh` helper
 - ✅ Local testing commands
 - ✅ Link to `docs/CI.md` for details
 
-**File**: `README.md` (UPDATED)
+**File**: `../../README.md` (UPDATED)
 - ✅ Added link to `docs/CI.md` in Documentation section
 
 ### 4. Repository Hygiene
 
-**File**: `.gitignore` (UPDATED)
+**File**: `../../.gitignore` (UPDATED)
 - ✅ Added `/logs/` entry (was missing)
 - ✅ Verified all common build artifacts are ignored
 
@@ -117,13 +117,13 @@ The repository has been improved with:
 The project already has excellent testing infrastructure:
 
 ✅ **Unit Tests**
-- Location: `src/test/java/`
+- Location: `../../src/test/java`
 - Framework: JUnit 5 (Jupiter)
 - Mocking: Mockito with inline support for final classes
 - Run: `./gradlew test`
 
 ✅ **Integration Tests**
-- Location: `src/integrationTest/java/`
+- Location: `../../src/integrationTest/java`
 - Framework: JUnit 5 (Jupiter)
 - Gradle Task: `integrationTest` (optional, requires `-PintegrationTest` flag)
 - Run: `./gradlew integrationTest -PintegrationTest`
@@ -137,23 +137,23 @@ The project already has excellent testing infrastructure:
 
 ## What's Not Changed (Existing Good Practices)
 
-✅ `build.gradle` - Already properly configured with test support (no changes needed)  
-✅ `gradle.properties` - Version management is solid (no changes needed)  
-✅ `qodana.yaml` - Profile and settings are correct (verified compatible)  
-✅ `src/` structure - Well-organized with test and integrationTest sets  
+✅ `../../build.gradle` - Already properly configured with test support (no changes needed)  
+✅ `../../gradle.properties` - Version management is solid (no changes needed)  
+✅ `../../qodana.yaml` - Profile and settings are correct (verified compatible)  
+✅ `../../src` structure - Well-organized with test and integrationTest sets  
 
 ---
 
 ## Workflow Files Reference
 
-### GitHub Actions Files (under `.github/workflows/`)
+### GitHub Actions Files (under `../../.github/workflows`)
 | File | Purpose | Trigger |
 |------|---------|---------|
 | `build.yml` | Main build, test, and artifact upload | Push/PR on all branches |
 | `qodana_code_quality.yml` | Code quality analysis | Push to main/creation, PR, manual |
 | `integration-test.yml` | Integration test execution | Push to main, PR to main, manual |
 
-### Gitea Workflows (under `.gitea/workflows/`)
+### Gitea Workflows (under `../../.gitea/workflows`)
 | File | Purpose | Runner |
 |------|---------|--------|
 | `ci.yml` | Primary build pipeline | Self-hosted with Docker |
