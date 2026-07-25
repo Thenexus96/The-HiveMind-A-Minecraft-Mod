@@ -64,6 +64,35 @@ public class DroneControlManager {
     return true;
   }
 
+  private static void savePlayerStates(ServerPlayerEntity player) {
+    PlayerState state =
+        new PlayerState(player.getPos(), player.getPitch(), player.getYaw(), player.getAbilities());
+    savedPlayerStates.put(player.getUuid(), state);
+  }
+
+  private static void restorePlayerState(ServerPlayerEntity player) {
+    PlayerState state = savedPlayerStates.get(player.getUuid());
+    if (state != null) {
+      player.teleport(state.getPosition().x, state.getPosition().y, state.getPosition().z);
+      player.setYaw(state.getyRot());
+      player.setPitch(state.getxRot());
+
+      // Manually copied abilities back
+      PlayerAbilities playerAbilities = player.getAbilities();
+      PlayerAbilities savedAbilites = state.getAbilities();
+      playerAbilities.allowFlying = savedAbilites.allowFlying;
+      playerAbilities.flying = savedAbilites.flying;
+      playerAbilities.invulnerable = savedAbilites.invulnerable;
+      playerAbilities.creativeMode = savedAbilites.creativeMode;
+      playerAbilities.allowModifyWorld = savedAbilites.allowModifyWorld;
+      playerAbilities.setFlySpeed(savedAbilites.getFlySpeed());
+      playerAbilities.setWalkSpeed(savedAbilites.getWalkSpeed());
+
+      player.sendAbilitiesUpdate();
+      player.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(playerAbilities));
+    }
+  }
+
   public static void updateDroneCamera(ServerPlayerEntity player) {
     DroneEntity drone = getControlledDrone(player);
     if (drone != null) {
@@ -123,46 +152,6 @@ public class DroneControlManager {
     // Notify client of control transfer
     DroneControlPacket controlPacket = new DroneControlPacket(drone.getId(), true);
     NetworkHandler.sendDroneControlToClient(player, controlPacket);
-  }
-
-  private static void savePlayerStates(ServerPlayerEntity player) {
-    // Create a new PlayerAbilites and copy values manually
-    PlayerAbilities originalAbilites = player.getAbilities();
-    PlayerAbilities copiedAbilites = new PlayerAbilities();
-    copiedAbilites.allowFlying = originalAbilites.allowFlying;
-    copiedAbilites.flying = originalAbilites.flying;
-    copiedAbilites.invulnerable = originalAbilites.invulnerable;
-    copiedAbilites.creativeMode = originalAbilites.creativeMode;
-    copiedAbilites.allowModifyWorld = originalAbilites.allowModifyWorld;
-    copiedAbilites.setFlySpeed(originalAbilites.getFlySpeed());
-    copiedAbilites.setWalkSpeed(originalAbilites.getWalkSpeed());
-
-    PlayerState state =
-        new PlayerState(player.getPos(), player.getPitch(), player.getYaw(), copiedAbilites);
-    savedPlayerStates.put(player.getUuid(), state);
-  }
-
-  private static void restorePlayerState(ServerPlayerEntity player) {
-    PlayerState state = savedPlayerStates.get(player.getUuid());
-    if (state != null) {
-      player.teleport(state.getPosition().x, state.getPosition().y, state.getPosition().z);
-      player.setYaw(state.getyRot());
-      player.setPitch(state.getxRot());
-
-      // Manually copied abilities back
-      PlayerAbilities playerAbilities = player.getAbilities();
-      PlayerAbilities savedAbilites = state.getAbilities();
-      playerAbilities.allowFlying = savedAbilites.allowFlying;
-      playerAbilities.flying = savedAbilites.flying;
-      playerAbilities.invulnerable = savedAbilites.invulnerable;
-      playerAbilities.creativeMode = savedAbilites.creativeMode;
-      playerAbilities.allowModifyWorld = savedAbilites.allowModifyWorld;
-      playerAbilities.setFlySpeed(savedAbilites.getFlySpeed());
-      playerAbilities.setWalkSpeed(savedAbilites.getWalkSpeed());
-
-      player.sendAbilitiesUpdate();
-      player.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(playerAbilities));
-    }
   }
 
   public static boolean isPlayerControllingDrone(ServerPlayerEntity player) {

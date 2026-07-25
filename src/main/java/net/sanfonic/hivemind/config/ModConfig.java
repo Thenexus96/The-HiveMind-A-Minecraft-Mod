@@ -39,7 +39,7 @@ public class ModConfig {
     this.configPath = FabricLoader.getInstance().getConfigDir().resolve(CONFIG_FILE_NAME);
   }
 
-  public static ModConfig getInstance() {
+  public static synchronized ModConfig getInstance() {
     if (INSTANCE == null) {
       INSTANCE = new ModConfig();
       INSTANCE.load();

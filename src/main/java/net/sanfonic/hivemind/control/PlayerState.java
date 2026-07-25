@@ -13,7 +13,7 @@ public class PlayerState {
     this.position = position;
     this.xRot = xRot;
     this.yRot = yRot;
-    this.abilities = abilities;
+    this.abilities = copyAbilities(abilities);
   }
 
   public Vec3d getPosition() {
@@ -29,6 +29,19 @@ public class PlayerState {
   }
 
   public PlayerAbilities getAbilities() {
-    return abilities;
+    return copyAbilities(this.abilities);
+  }
+
+  private static PlayerAbilities copyAbilities(PlayerAbilities source) {
+    // Create a new PlayerAbilites and copy values manually
+    PlayerAbilities copiedAbilites = new PlayerAbilities();
+    copiedAbilites.allowFlying = source.allowFlying;
+    copiedAbilites.flying = source.flying;
+    copiedAbilites.invulnerable = source.invulnerable;
+    copiedAbilites.creativeMode = source.creativeMode;
+    copiedAbilites.allowModifyWorld = source.allowModifyWorld;
+    copiedAbilites.setFlySpeed(source.getFlySpeed());
+    copiedAbilites.setWalkSpeed(source.getWalkSpeed());
+    return copiedAbilites;
   }
 }

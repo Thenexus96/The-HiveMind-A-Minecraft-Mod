@@ -210,7 +210,7 @@ public class HiveCodeManager extends PersistentState {
    * @return true if the code exists for this player
    */
   public boolean isCodeInUseByPlayer(String hiveCode, UUID ownerUUID) {
-    UUID codeOwner = codeToOwner.get(hiveCode);
+    UUID codeOwner = getOwnerFromCode(hiveCode);
     return codeOwner != null && codeOwner.equals(ownerUUID);
   }
 
