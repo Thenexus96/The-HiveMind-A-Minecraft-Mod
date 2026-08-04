@@ -14,21 +14,18 @@ import org.junit.jupiter.api.Test;
 public class DroneLinkUtilsTest {
 
   private HiveMindService originalProvider;
+  private HiveCodeManager testCode;
+  private HiveMindLinkManager testLink;
+  private DroneTelemetryStore testTelemetry;
+  private HiveMindService testService;
 
   @BeforeEach
   public void setup() {
-    // preserve original
+    // Preserve original
     originalProvider = HiveMindServiceManager.get();
-  }
 
-  @AfterEach
-  public void teardown() {
-    HiveMindServiceManager.setProvider(originalProvider);
-  }
-
-  @Test
-  public void testLinkDroneWithService() {
-    HiveCodeManager testCode =
+    // Initialize test objects
+    testCode =
         new HiveCodeManager() {
           @Override
           public String generateHiveCode(UUID droneUUID, UUID ownerUUID) {
@@ -36,11 +33,10 @@ public class DroneLinkUtilsTest {
           }
         };
 
-    HiveMindLinkManager testLink = new HiveMindLinkManager();
+    testLink = new HiveMindLinkManager();
+    testTelemetry = new DroneTelemetryStore();
 
-    DroneTelemetryStore testTelemetry = new DroneTelemetryStore();
-
-    HiveMindService testService =
+    testService =
         new HiveMindService() {
           @Override
           public HiveMindLinkManager getLinkManager(MinecraftServer server) {
@@ -59,7 +55,15 @@ public class DroneLinkUtilsTest {
         };
 
     HiveMindServiceManager.setProvider(testService);
+  }
 
+  @AfterEach
+  public void teardown() {
+    HiveMindServiceManager.setProvider(originalProvider);
+  }
+
+  @Test
+  public void testLinkDroneWithService() {
     UUID drone = UUID.randomUUID();
     UUID owner = UUID.randomUUID();
 
@@ -74,7 +78,8 @@ public class DroneLinkUtilsTest {
 
   @Test
   public void testGetDroneOwner_delegatesToLinkManager() {
-    HiveMindLinkManager testLink =
+    // Override testLink for this specific test
+    testLink =
         new HiveMindLinkManager() {
           @Override
           public UUID getDroneOwner(UUID droneUUID) {
@@ -82,7 +87,8 @@ public class DroneLinkUtilsTest {
           }
         };
 
-    HiveMindService testService =
+    // Recreate testService to use the overridden testLink
+    testService =
         new HiveMindService() {
           @Override
           public HiveMindLinkManager getLinkManager(MinecraftServer server) {

@@ -1,8 +1,8 @@
 # Sprint 1 — Runbook
 
-Last updated: 2026-07-04
+Last updated: 2026-08-01
 
-**Sprint Progress: 40% Complete (2/5 tasks done)**
+**Sprint Progress: 60% Complete (3/5 tasks done)**
 
 This runbook explains how to run Sprint 1 locally and in CI, lists the sprint goals and acceptance criteria, and provides step-by-step developer onboarding commands, config examples, and the PR checklist so contributors can complete work reproducibly.
 
@@ -64,14 +64,6 @@ Acceptance criteria (Definition of Done)
   - Need: Node entity/tile, claim mechanic, resource increment
   - Estimated 2-3 days to complete
 
-### Pending ⏳
-
-4. **Node Claiming & Resource Flow** (Task D)
-  - ⏳ Depends on research skeleton patterns
-  - Need: Node entity/tile, claim mechanic, resource increment
-
-5. **Documentation & Debugging Tools** (Task E)
-  - ⏳ Will update DESIGN_DECISIONS.md and QUICK_START.md at sprint end
 
 Quick onboarding / prerequisites
  - Java 17 SDK installed (recommended: AdoptOpenJDK/Temurin 17).
