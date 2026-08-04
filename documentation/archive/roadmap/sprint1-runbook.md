@@ -2,7 +2,7 @@
 
 Last updated: 2026-08-01
 
-**Sprint Progress: 60% Complete (3/5 tasks done)**
+**Sprint Progress: 80% Complete (4/5 tasks done)**
 
 This runbook explains how to run Sprint 1 locally and in CI, lists the sprint goals and acceptance criteria, and provides step-by-step developer onboarding commands, config examples, and the PR checklist so contributors can complete work reproducibly.
 
@@ -57,12 +57,19 @@ Acceptance criteria (Definition of Done)
   - ✅ Unit test verifying unlock writes the effect into the Hive research state
   - Files: `ResearchNode.java`, `ResearchManager.java`, `ResearchCommands.java`, `ResearchTest.java`
 
-### In Progress 🔄
-
 4. **Node Claiming & Resource Flow** (Task D)
-  - 🔄 Now in progress — depends on research unlock patterns
-  - Need: Node entity/tile, claim mechanic, resource increment
-  - Estimated 2-3 days to complete
+  - ✅ Implemented Node model with resource values
+  - ✅ Implemented NodeManager registry with sample nodes
+  - ✅ Claim mechanic: `NodeManager.claimForPlayer()` increments hive resources
+  - ✅ Server-side command `/hive node claim <nodeId>` 
+  - ✅ Unit tests verifying claim flow and resource increment
+  - Files: `Node.java`, `NodeManager.java`, `NodeCommands.java`, `NodeTest.java`
+
+### Pending ⏳
+
+5. **Documentation & Integration** (Task E)
+  - ⏳ Integration tests for server restart persistence (manual smoke test)
+  - ⏳ Final sprint documentation and acceptance criteria checklist
 
 
 Quick onboarding / prerequisites
