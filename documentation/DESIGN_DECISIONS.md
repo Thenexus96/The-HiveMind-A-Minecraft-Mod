@@ -61,15 +61,52 @@ Implementation notes
 API notes
 - HiveManager: createHive(UUID owner), getHive(UUID owner), joinHive(UUID guest, UUID host), leaveHive(UUID guest), serialize/deserialize
 
-## 4. Third-party Integrations
+## 5. Ownership & Authority: HiveMindLinkManager as Canonical System
 
-Decision
-- Defer official mod integrations until Phase 3+.
+**Decision (ADR-0007)**
+- HiveMindLinkManager is the canonical authority for drone-owner relationships.
+- All gameplay decisions about drone ownership query HiveMindLinkManager, routed through HiveMindServiceManager for testability.
+- Three separate systems exist with distinct concerns; no consolidation required:
+  - **HiveMindLinkManager** (canonical): drone-owner mappings, world NBT persistence
+  - **PlayerHiveComponent** (access control): per-player access gating, file persistence
+  - **Hive/HiveManager** (collective mechanics): guild-like groups, shared resources, research tracking
 
-Rationale
-- Reduces scope during core gameplay development; avoids coupling early design to other mods' APIs.
+**Rationale**
+- HiveMindLinkManager is already the de facto authority in gameplay (DroneEntity, DroneLinkUtils).
+- Formalizing it enables Tier 1 MVP mental power gating logic ("does player X own drone Y?").
+- Routing through HiveMindServiceManager makes testing possible (mock service provider).
+- Each system has distinct responsibility; separation avoids data duplication and conflict.
+- Consolidation deferred to Tier 2+ when collective features expand.
 
-## 5. Performance Targets & Server/Client Trade-offs
+**Implementation Notes**
+- All ownership queries: `HiveMindServiceManager.get().getLinkManager(server).queryMethod(...)`
+- Drone linking flow: Player claims → `DroneLinkUtils.linkDroneToOwner()` → LinkManager.linkDroneToOwner()
+- Mental power gating: `HiveCore.getMentalPower(player)` checks `LinkManager.getOwnerDrones(player)` to gate behavior
+- Drone death cleanup: `DroneEntity.removeHiveMindConnection()` → `LinkManager.unlinkDrone()`
+
+**Architecture**
+```
+Player joins HiveMind
+  → PlayerHiveComponent.initializeNewMember() [access gating, file persist]
+
+Player claims drone
+  → DroneLinkUtils.linkDroneToOwner() [canonical ownership]
+  → HiveMindServiceManager.get().getLinkManager(server).linkDroneToOwner()
+  → HiveMindLinkManager stores: player UUID → drone UUID (bidirectional)
+
+Ownership query (e.g., mental power gating)
+  → HiveMindServiceManager.get().getLinkManager(server).getOwnerDrones(playerUUID)
+  → Returns list of drone UUIDs owned by player
+  
+Drone death
+  → DroneEntity.removeHiveMindConnection()
+  → HiveMindServiceManager.get().getLinkManager(server).unlinkDrone()
+```
+
+**See Also**
+- ADR-0007: `documentation/history/ADR/ADR-0007-ownership-system.md`
+
+## 6. Performance Targets & Server/Client Trade-offs
 
 Decision
 - Start with a conservative default (50 drones) and expose server-admin configuration options to increase limits. Offer a "near-infinite" option with warnings that it may cause severe performance degradation.

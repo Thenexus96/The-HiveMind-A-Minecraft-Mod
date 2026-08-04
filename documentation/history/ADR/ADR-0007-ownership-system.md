@@ -97,3 +97,75 @@ Drone death
 → DroneEntity.removeHiveMindConnection()
 → HiveMindServiceManager.getLinkManager().unlinkDrone() [cleanup via LinkManager]
 
+**Separation of Concerns:**
+- **HiveMindLinkManager:** "Which drones does this player own?"
+- **PlayerHiveComponent:** "Does this player have HiveMind access?"
+- **Hive/HiveManager:** "What are the collective's shared resources and research?"
+
+---
+
+## Implementation Plan
+
+### Tier 1 Blocking (Now)
+1. **Document** decision in DESIGN_DECISIONS.md
+2. **Verify** all ownership checks already use LinkManager (they do)
+3. **Add ADR** to codebase (this file)
+
+### Tier 1 MVP (Immediate)
+- Mental power gating uses LinkManager to verify ownership
+- No code changes needed; LinkManager already in place
+
+### Tier 2+ (Future)
+- **Option A:** Migrate Hive/HiveManager into LinkManager (if collective features expand)
+- **Option B:** Migrate PlayerHiveComponent access state into LinkManager (consolidation)
+- **Option C:** Add reconciliation task to detect orphaned state
+
+---
+
+## Consequences
+
+### Positive
+✅ **Clarity:** All developers know LinkManager is the authority  
+✅ **Testability:** Service-managed access enables mocking  
+✅ **Low Risk:** No code changes needed; formalizes existing pattern  
+✅ **MVP Unblocked:** Tier 1 can build mental power gating confidently
+
+### Negative / Accepted Debt
+⚠️ **Hive/HiveManager Orphaned:** Defined but not wired to core gameplay (acceptable: kept for `/hive` commands)  
+⚠️ **No Synchronization:** Three systems persist independently (acceptable: they track separate concerns, no conflicts observed)  
+⚠️ **Future Consolidation Needed:** PlayerHiveComponent access + HiveMindLinkManager could be merged (deferred to Tier 2+)
+
+---
+
+## Open Questions / Future Decisions
+
+1. **Should PlayerHiveComponent access state be consolidated into LinkManager?**
+    - Currently separate (file persistence vs. world NBT)
+    - Consolidation would create single "player → hive membership" record
+    - Deferred: post-Tier-1 architecture decision
+
+2. **Should Hive/HiveManager be integrated or retired?**
+    - Currently unused for core gameplay
+    - `/hive` commands still work and could expand
+    - Deferred: depends on collective mechanics roadmap (Tier 3+)
+
+3. **Should a reconciliation task detect orphaned state?**
+    - E.g., "drone has no owner in LinkManager"
+    - E.g., "player's drone listed but LinkManager disagrees"
+    - Deferred: Tier 3 quality task if needed
+
+---
+
+## References
+
+- **Audit:** `/mnt/user-data/uploads/OWNERSHIP_AUDIT_HIV-91.md` (Copilot analysis, 2026-08-04)
+- **Linear Issues:** HIV-81, HIV-93, HIV-94 (ownership reconciliation epic)
+- **Related Code:**
+    - `HiveMindLinkManager.java` — canonical system
+    - `HiveMindServiceManager.java` — abstraction layer
+    - `DroneLinkUtils.java` — primary call site
+    - `DroneEntity.java` — ownership verification
+
+---
+
+**Status:** ✅ **ACCEPTED** — Documented, formalized, blocking issues unblocked.

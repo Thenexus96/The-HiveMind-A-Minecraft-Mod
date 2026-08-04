@@ -28,41 +28,41 @@ multi-module layout to chase this until Nick raises it again. See
 
 ---
 
-## 2. Current focus: fixing ownership/persistence, not adding features
+## 2. Current focus: Ownership architecture formalized (ADR-0007)
 
-The mod has **four overlapping systems that all partially track "who owns this
-drone / who's in this hive"**, built across separate sessions with no
-reconciliation pass:
+**Status Update (2026-08-04):** Ownership architecture has been formalized and decided.
 
-| System | What it tracks | Status |
+See **ADR-0007: Ownership System Architecture** (`documentation/history/ADR/ADR-0007-ownership-system.md`) for the complete decision.
+
+### Decision Summary
+
+**HiveMindLinkManager is the canonical authority for drone-owner relationships.**
+
+The mod has three ownership systems, each with distinct responsibility (no consolidation needed):
+
+| System | Purpose | Status |
 |---|---|---|
-| `Hive` / `HiveManager` | Player-centric: membership, resources, research state | Only touched by `/hive join` and `/hive leave`. Not wired into anything else yet. |
-| `HiveMindLinkManager` | Drone-centric UUID → owner UUID map | Actively used — this is the real persistence path for drone ownership today. |
-| `HiveMindData` | Player NBT flags (access, join time, hive id) | Legacy-ish, overlaps with `PlayerHiveComponent`. |
-| `PlayerHiveComponent` | File-based per-player access/hive-id cache | Overlaps with `HiveMindData`. |
+| `HiveMindLinkManager` | Drone → owner mapping (canonical) | ✓ Actively used in gameplay; routed through `HiveMindServiceManager` for testability |
+| `PlayerHiveComponent` | Per-player access control (file persistence) | ✓ Correct; independent from ownership queries |
+| `Hive` / `HiveManager` | Collective mechanics (guild model, research) | ✓ Intentionally isolated from drone ownership; for Tier 2+ feature expansion |
 
-`DroneEntity` itself only stores `hiveMindOwnerUuid` directly — it never
-references a `Hive` object. That's the root cause: two designs (drone-owns-UUID
-vs. hive-owns-members) coexisting without ever being reconciled.
+**Why this design?**
+1. HiveMindLinkManager is already the de facto authority in practice
+2. Each system solves a different problem (no overlap, no conflict)
+3. Enables Tier 1 MVP mental power gating: "does player X own drone Y?"
+4. Formalizing it clarifies all call sites and makes testing possible
+5. Future consolidation (Tier 2+) is now possible without risk of divergence
 
-**The plan is to collapse these into one source of truth before building
-anything new on top.** Modeling the entity relationship diagram (Player, Hive,
-HiveCore, Drone, and how ownership/control relate) is the step that got skipped
-originally and is what produced this mess — that ERD needs to happen before any
-new manager classes get written.
+### Concrete fixed issues
 
-### Concrete known bug (next immediate step)
+- ✓ **HIV-92:** `DroneEntity.restoreHiveMindConnection()` and `removeHiveMindConnection()` now route through `HiveMindServiceManager.get()` (testable seam)
+- ✓ **HIV-89 & HIV-90:** `DroneLinkUtilsTest` refactored to use `@BeforeEach` fixtures (no duplicate variable declarations)
 
-In `DroneEntity.java`:
-- `setHiveMindOwner()` correctly routes through `HiveMindServiceManager.get()` —
-  this is the testable seam, matching the pattern in `DroneLinkUtilsTest`.
-- `restoreHiveMindConnection()` and `removeHiveMindConnection()` **bypass it**,
-  calling `HiveMindLinkManager.getInstance(server)`, `HiveCodeManager.getInstance(server)`,
-  and `DroneTelemetryStore.getInstance(server)` directly.
-- This makes those two methods untestable via the mock-service pattern.
+### Next work (HIV-94 Phase 2+)
 
-**Fix:** route both through `HiveMindServiceManager.get()` the same way the
-write path does.
+- Code audit: verify no remaining direct `getInstance()` calls outside service layer
+- Add integration tests for mental power gating (Tier 1 MVP use case)
+- Document Hive/HiveManager javadoc to clarify they're not orphaned, just isolated
 
 ---
 

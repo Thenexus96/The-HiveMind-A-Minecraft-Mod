@@ -43,6 +43,17 @@ Or manually:
 - Read: [Data Flow Diagram](archive/design/data-flow.md)
 - Read: [API Documentation](wiki/API-Documentation.md)
 
+### 🔗 Understand drone ownership
+- Read: [ADR-0007: Ownership System](history/ADR/ADR-0007-ownership-system.md) ← **START HERE for ownership questions**
+- Summary: **HiveMindLinkManager is the canonical authority** for drone-owner relationships
+- How it works:
+  1. Player claims drone → `DroneLinkUtils.linkDroneToOwner()` → stored in `HiveMindLinkManager`
+  2. Check who owns a drone → `HiveMindServiceManager.get().getLinkManager(server).getDroneOwner(droneUUID)`
+  3. Get all drones owned by player → `LinkManager.getOwnerDrones(playerUUID)`
+  4. Drone dies → `DroneEntity.removeHiveMindConnection()` → `LinkManager.unlinkDrone()`
+- All ownership queries must route through `HiveMindServiceManager` for testability
+- See [DESIGN_DECISIONS.md](DESIGN_DECISIONS.md#5-ownership--authority-hivemindlinkmanager-as-canonical-system) for detailed architecture
+
 ### 📊 Check project progress
 - Read: [Roadmap & Progress Tracking](roadmap/progress-tracking.md)
 - Read: [Phase 2 Details](roadmap/phase-2-drone-framework.md)

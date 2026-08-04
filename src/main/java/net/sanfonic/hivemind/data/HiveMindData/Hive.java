@@ -10,8 +10,18 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 
 /**
- * Represents a player's hive: owner UUID, members, resources, and research state. Immutable data
- * class persisted to NBT.
+ * Represents a player collective (guild-like group of players).
+ * 
+ * NOTE: This is NOT used for drone ownership decisions. See HiveMindLinkManager for
+ * the canonical ownership system (ADR-0007).
+ * 
+ * Hive is used for collective mechanics:
+ * - Member management (guild members)
+ * - Shared resources (collective pool)
+ * - Research tracking (collective skill tree)
+ * 
+ * Persisted to world NBT via HiveManager.
+ * See ADR-0007 for detailed ownership architecture explanation.
  */
 public class Hive {
 
