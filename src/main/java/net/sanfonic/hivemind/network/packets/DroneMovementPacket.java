@@ -8,102 +8,110 @@ import net.sanfonic.hivemind.entity.DroneEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record DroneMovementPacket(float forward, float strafe, float up, boolean jumping, boolean crouching, float yaw,
-                                  float pitch) {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DroneMovementPacket.class);
+public record DroneMovementPacket(
+    float forward,
+    float strafe,
+    float up,
+    boolean jumping,
+    boolean crouching,
+    float yaw,
+    float pitch) {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DroneMovementPacket.class);
 
-    public static DroneMovementPacket read(PacketByteBuf buf) {
-        float forward = buf.readFloat();
-        float strafe = buf.readFloat();
-        float up = buf.readFloat();
-        boolean jumping = buf.readBoolean();
-        boolean crouching = buf.readBoolean();
-        float yaw = buf.readFloat();
-        float pitch = buf.readFloat();
+  public static DroneMovementPacket read(PacketByteBuf buf) {
+    float forward = buf.readFloat();
+    float strafe = buf.readFloat();
+    float up = buf.readFloat();
+    boolean jumping = buf.readBoolean();
+    boolean crouching = buf.readBoolean();
+    float yaw = buf.readFloat();
+    float pitch = buf.readFloat();
 
-        return new DroneMovementPacket(forward, strafe, up, jumping, crouching, yaw, pitch);
+    return new DroneMovementPacket(forward, strafe, up, jumping, crouching, yaw, pitch);
+  }
+
+  public void write(PacketByteBuf buf) {
+    buf.writeFloat(forward);
+    buf.writeFloat(strafe);
+    buf.writeFloat(up);
+    buf.writeBoolean(jumping);
+    buf.writeBoolean(crouching);
+    buf.writeFloat(yaw);
+    buf.writeFloat(pitch);
+  }
+
+  public void handle(ServerPlayerEntity player) {
+    if (!DroneControlManager.isPlayerControllingDrone(player)) {
+      return;
     }
 
-    public void write(PacketByteBuf buf) {
-        buf.writeFloat(forward);
-        buf.writeFloat(strafe);
-        buf.writeFloat(up);
-        buf.writeBoolean(jumping);
-        buf.writeBoolean(crouching);
-        buf.writeFloat(yaw);
-        buf.writeFloat(pitch);
+    DroneEntity drone = DroneControlManager.getControlledDrone(player);
+    if (drone == null || !drone.isAlive()) {
+      return;
     }
 
-    public void handle(ServerPlayerEntity player) {
-        if (!DroneControlManager.isPlayerControllingDrone(player)) {
-            return;
-        }
+    // Use the dedicated rotation update method instead of direct settings
+    drone.updateRotationFromInput(yaw, pitch);
 
-        DroneEntity drone = DroneControlManager.getControlledDrone(player);
-        if (drone == null || !drone.isAlive()) {
-            return;
-        }
+    // Apply movement if there's any input
+    if (forward != 0f || strafe != 0f || up != 0f) {
+      Vec3d movement = calculateMovement(drone);
+      drone.setVelocity(movement);
+      drone.velocityDirty = true;
 
-        // Use the dedicated rotation update method instead of direct settings
-        drone.updateRotationFromInput(yaw, pitch);
-
-        // Apply movement if there's any input
-        if (forward != 0f || strafe != 0f || up != 0f) {
-            Vec3d movement = calculateMovement(drone);
-            drone.setVelocity(movement);
-            drone.velocityDirty = true;
-
-            // Debug movement less frequently
-            if (player.getWorld().getTime() % 40 == 0) {
-                LOGGER.debug("Drone movement applied: {}", movement);
-            }
-        } else {
-            // Stop the drone if no input
-            Vec3d currentVel = drone.getVelocity();
-            drone.setVelocity(currentVel.multiply(0.8, 0.9, 0.8)); // Gradual stop
-            drone.velocityDirty = true;
-        }
-
-        // Handle special actions
-        if (jumping) {
-            drone.triggerPrimaryAbility();
-        }
-        if (crouching) {
-            drone.triggerSecondaryAbility();
-        }
-        LOGGER.trace("Server received drone rotation pitch={} yaw={}; drone current pitch={} yaw={}",
-                pitch, yaw, drone.getPitch(), drone.getYaw());
+      // Debug movement less frequently
+      if (player.getWorld().getTime() % 40 == 0) {
+        LOGGER.debug("Drone movement applied: {}", movement);
+      }
+    } else {
+      // Stop the drone if no input
+      Vec3d currentVel = drone.getVelocity();
+      drone.setVelocity(currentVel.multiply(0.8, 0.9, 0.8)); // Gradual stop
+      drone.velocityDirty = true;
     }
 
-    private Vec3d calculateMovement(DroneEntity drone) {
-        // Get drone's current orientation in radians
-        float yawRad = (float) Math.toRadians(drone.getYaw());
-        float pitchRad = (float) Math.toRadians(drone.getPitch());
-
-        // Calculate forward direction vector
-        Vec3d forwardDir = new Vec3d(
-                -Math.sin(yawRad) * Math.cos(pitchRad),
-                -Math.sin(pitchRad),
-                Math.cos(yawRad) * Math.cos(pitchRad)
-        );
-
-        // Calculate right direction vector (perpendicular to forward, on horizontal plane)
-        Vec3d rightDir = new Vec3d(
-                -Math.cos(yawRad),
-                0,
-                -Math.sin(yawRad)
-        );
-
-        // Calculate up direction vector (always world up)
-        Vec3d upDir = new Vec3d(0, 1, 0);
-
-        // Base movement speed
-        float baseSpeed = drone.getFlySpeed() * 2.0f; // Increase speed for better control feel
-
-        // Combine movement vectors
-        Vec3d movement = forwardDir.multiply(forward * baseSpeed)
-                .add(rightDir.multiply(strafe * baseSpeed))
-                .add(upDir.multiply(up * baseSpeed));
-        return movement;
+    // Handle special actions
+    if (jumping) {
+      drone.triggerPrimaryAbility();
     }
+    if (crouching) {
+      drone.triggerSecondaryAbility();
+    }
+    LOGGER.trace(
+        "Server received drone rotation pitch={} yaw={}; drone current pitch={} yaw={}",
+        pitch,
+        yaw,
+        drone.getPitch(),
+        drone.getYaw());
+  }
+
+  private Vec3d calculateMovement(DroneEntity drone) {
+    // Get drone's current orientation in radians
+    float yawRad = (float) Math.toRadians(drone.getYaw());
+    float pitchRad = (float) Math.toRadians(drone.getPitch());
+
+    // Calculate forward direction vector
+    Vec3d forwardDir =
+        new Vec3d(
+            -Math.sin(yawRad) * Math.cos(pitchRad),
+            -Math.sin(pitchRad),
+            Math.cos(yawRad) * Math.cos(pitchRad));
+
+    // Calculate right direction vector (perpendicular to forward, on horizontal plane)
+    Vec3d rightDir = new Vec3d(-Math.cos(yawRad), 0, -Math.sin(yawRad));
+
+    // Calculate up direction vector (always world up)
+    Vec3d upDir = new Vec3d(0, 1, 0);
+
+    // Base movement speed
+    float baseSpeed = drone.getFlySpeed() * 2.0f; // Increase speed for better control feel
+
+    // Combine movement vectors
+    Vec3d movement =
+        forwardDir
+            .multiply(forward * baseSpeed)
+            .add(rightDir.multiply(strafe * baseSpeed))
+            .add(upDir.multiply(up * baseSpeed));
+    return movement;
+  }
 }

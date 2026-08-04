@@ -88,9 +88,7 @@
     <module name="RedundantModifier"/>
 
     <!-- Block checks -->
-    <module name="AvoidNestedBlocks">
-      <property name="allowedNesting" value="2"/>
-    </module>
+    <module name="AvoidNestedBlocks"/>
     <module name="EmptyBlock"/>
     <module name="LeftCurly"/>
     <module name="RightCurly"/>

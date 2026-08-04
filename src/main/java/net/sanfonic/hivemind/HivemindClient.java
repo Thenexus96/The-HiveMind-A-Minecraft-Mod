@@ -12,20 +12,20 @@ import net.sanfonic.hivemind.control.DroneInputHandler;
 import net.sanfonic.hivemind.entity.ModEntities;
 
 public class HivemindClient implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        // Register your client handler
-        DroneClientHandler.init();
-        // Also make sure your input handler is registered
-        DroneInputHandler.init(); // If this is client-side
-        // Existing entity renderer registration
-        EntityRendererRegistry.register(ModEntities.DRONE, DroneRenderer::new);
-        // New keybind and GUI system
-        KeyBindings.registerKeyBindings();
-        ClientEventHandler.registerEvents();
-        DroneDebugOverlay.register();
-        DebugKeyBindings.register();
+  @Override
+  public void onInitializeClient() {
+    // Register your client handler
+    DroneClientHandler.init();
+    // Also make sure your input handler is registered
+    DroneInputHandler.init(); // If this is client-side
+    // Existing entity renderer registration
+    EntityRendererRegistry.register(ModEntities.DRONE, DroneRenderer::new);
+    // New keybind and GUI system
+    KeyBindings.registerKeyBindings();
+    ClientEventHandler.registerEvents();
+    DroneDebugOverlay.register();
+    DebugKeyBindings.register();
 
-        Hivemind.LOGGER.info("HiveMind client initialized");
-    }
+    Hivemind.LOGGER.info("HiveMind client initialized");
+  }
 }

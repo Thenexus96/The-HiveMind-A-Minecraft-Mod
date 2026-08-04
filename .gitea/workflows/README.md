@@ -87,5 +87,5 @@ mv ci-advanced.yml ci.yml
 
 - [Gitea Actions Documentation](https://docs.gitea.io/en-us/actions/act-runner-installation/)
 - [Gradle Docker Image](https://hub.docker.com/_/gradle)
-- [HiveMind Development](../../docs/QUICK_START.md)
+- [HiveMind Development](../../documentation/QUICK_START.md)
 

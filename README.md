@@ -2,9 +2,9 @@
 
 **A Minecraft mod for controlling drone entities through a neural hive network**
 
-[![Build Status](badge-url)](link)
-[![License](badge)](license-link)
-[![Minecraft Version](badge)](version)
+- **Status:** Active development
+- **Minecraft:** 1.20.1
+- **Loader:** Fabric
 
 ## 🎮 About
 
@@ -22,9 +22,9 @@ and directly possess drones to extend your reach in the Minecraft world.
 
 ## 📦 Installation
 
-1. Download the latest release from [Releases](releases-link)
-2. Install [Fabric Loader](fabric-link) for Minecraft 1.20.1
-3. Install [Fabric API](fabric-api-link)
+1. Build the project locally, or obtain a release when one is published.
+2. Install Fabric Loader for Minecraft 1.20.1.
+3. Install Fabric API compatible with the selected Minecraft version.
 4. Place the mod JAR in your `mods` folder
 5. Launch Minecraft
 
@@ -37,23 +37,33 @@ and directly possess drones to extend your reach in the Minecraft world.
 
 ## 📖 Documentation
 
-- [Player Guide](docs/wiki/Player-Guide.md)
-- [Commands Reference](docs/wiki/Commands.md)
-- [Developer Documentation](docs/wiki/Developer-Guide.md)
-- [API Guide](docs/wiki/API-Documentation.md)
-- [Quick Start Guide](docs/QUICK_START.md)
-- [Gitea CI/CD Guide](docs/GITEA_CI.md) (Primary — Recommended First Read)
-- [Code Quality & Static Analysis](docs/CODE_QUALITY.md)
-- [Release & Version Management](docs/RELEASE.md)
-- [API Stability & Backward Compatibility](docs/API_STABILITY.md)
-- [Project Roadmap & Feature Planning](docs/ROADMAP.md)
-- [Technical Decision Process](docs/DECISION_PROCESS.md)
-- [CI & Developer Workflows](docs/CI.md) (GitHub Actions reference)
-- [Repository Maintenance](docs/MAINTENANCE.md)
+**Start Here**:
+- [🚀 Quick Start Guide](documentation/QUICK_START.md) — Navigation for all docs
+- [✅ Implementation Complete](documentation/archive/IMPLEMENTATION_COMPLETE.md) — Summary of all implementations
+
+**Development & CI**:
+- [Gitea CI/CD Guide](documentation/GITEA_CI.md) (Primary — Recommended First Read)
+- [Code Quality & Static Analysis](documentation/CODE_QUALITY.md)
+- [CI & Developer Workflows](documentation/CI.md) (GitHub Actions reference)
+
+**Release & Versioning**:
+- [Release & Version Management](documentation/RELEASE.md)
+- [API Stability & Backward Compatibility](documentation/API_STABILITY.md)
+
+**Planning & Roadmap**:
+- [Project Roadmap & Feature Planning](documentation/archive/ROADMAP.md)
+- [Technical Decision Process](documentation/DECISION_PROCESS.md)
+
+**Project Docs**:
+- [Player Guide](documentation/wiki/Player-Guide.md)
+- [Commands Reference](documentation/wiki/Commands.md)
+- [Developer Documentation](documentation/wiki/Developer-Guide.md)
+- [API Guide](documentation/wiki/API-Documentation.md)
+- [Repository Maintenance](documentation/MAINTENANCE.md)
 
 ## 🗺️ Roadmap
 
-See our [Development Roadmap](docs/roadmap/progress-tracking.md) for current progress and upcoming features.
+See our [Development Roadmap](documentation/roadmap/progress-tracking.md) for current progress and upcoming features.
 
 ### Current Phase: Phase 2 - Drone Framework ✅
 
@@ -69,11 +79,11 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for gu
 
 ## 🐛 Bug Reports
 
-Found a bug? Please [open an issue](issues-link) using the bug report template.
+Found a bug? Use the repository's bug-report template in `.github/ISSUE_TEMPLATE/bug_report.md`.
 
 ## 📜 License
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+A license file is not currently present in the repository. Do not distribute or reuse the project under an assumed license; add an explicit license before publishing releases.
 
 ## 🙏 Acknowledgments
 

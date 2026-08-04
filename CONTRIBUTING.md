@@ -96,7 +96,7 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit
 - **Checkstyle** — Enforces style rules
 - **SpotBugs** — Detects potential bugs
 
-See [CODE_QUALITY.md](docs/CODE_QUALITY.md) for detailed guide.
+See [CODE_QUALITY.md](documentation/CODE_QUALITY.md) for detailed guide.
 
 ### Commit Message Format
 
@@ -104,7 +104,7 @@ Types: Add, Fix, Change, Remove, Refactor, Docs, Test
 
 ## Project Structure
 
-See [Developer Guide](docs/wiki/Developer-Guide.md) for architecture details.
+See [Developer Guide](documentation/wiki/Developer-Guide.md) for architecture details.
 
 ## Questions?
 

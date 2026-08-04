@@ -68,5 +68,48 @@
   <Match>
     <Bug pattern="EQ_UNUSUAL_EQUALS_INHERITED_ODDNESS"/>
   </Match>
+
+  <!-- Live entity/session references are intentional: DroneControlSession must hold the
+     actual player and drone objects (not copies) so that live state checks like
+     isAlive() reflect real-time game state. Confirmed via in-game testing that a
+     defensive copy would break drone-death detection and session cleanup. -->
+  <Match>
+    <Class name="net.sanfonic.hivemind.control.DroneControlSession"/>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!-- FollowHiveMindPlayerGoal must hold the live DroneEntity it operates on; this is
+       the entity the goal drives every tick, not a snapshot. -->
+  <Match>
+    <Class name="net.sanfonic.hivemind.entity.custom.goal.FollowHiveMindPlayerGoal"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!-- Standard Minecraft GUI pattern: storing the parent Screen for back-navigation
+       on close(). This is how vanilla and modded Minecraft screens work. -->
+  <Match>
+    <Class name="net.sanfonic.hivemind.client.gui.HiveMindConfigScreen"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+  <Match>
+    <Class name="net.sanfonic.hivemind.client.gui.HiveMindMainGui"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!-- KeyBinding objects are registered once with Fabric's input system; the engine
+       needs the literal shared instance to check wasPressed()/isPressed() against.
+       There is no meaningful "copy" of a key binding. -->
+  <Match>
+    <Class name="net.sanfonic.hivemind.client.KeyBindings"/>
+    <Bug pattern="MS_EXPOSE_REP"/>
+  </Match>
+  <Match>
+    <Class name="net.sanfonic.hivemind.client.debug.DebugKeyBindings"/>
+    <Bug pattern="MS_EXPOSE_REP"/>
+  </Match>
+  <Match>
+    <Class name="net.sanfonic.hivemind.client.DroneClientHandler"/>
+    <Bug pattern="MS_EXPOSE_REP"/>
+  </Match>
 </FindBugsFilter>
 
