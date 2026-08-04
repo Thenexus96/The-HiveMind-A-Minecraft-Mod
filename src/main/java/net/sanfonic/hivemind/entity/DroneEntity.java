@@ -32,6 +32,7 @@ import net.sanfonic.hivemind.entity.custom.goal.FollowHiveMindPlayerGoal;
 import net.sanfonic.hivemind.entity.custom.role.DroneRole;
 import net.sanfonic.hivemind.entity.custom.role.DroneRoleBehavior;
 import net.sanfonic.hivemind.entity.custom.role.RoleRegistry;
+import net.sanfonic.hivemind.service.HiveMindServiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -232,7 +233,8 @@ public class DroneEntity extends PathAwareEntity {
 
       // Update the drone's telemetry store with current position/health
       String dimensionKey = this.getWorld().getRegistryKey().getValue().toString();
-      DroneTelemetryStore telemetry = DroneTelemetryStore.getInstance(server);
+      DroneTelemetryStore telemetry =
+          HiveMindServiceManager.get().getTelemetryStore(server);
       if (telemetry != null) {
         telemetry.updateDroneData(
             this.getUuid(),
@@ -246,7 +248,8 @@ public class DroneEntity extends PathAwareEntity {
       }
 
       // Restore HiveCode
-      HiveCodeManager codeManager = HiveCodeManager.getInstance(server);
+      HiveCodeManager codeManager =
+          HiveMindServiceManager.get().getHiveCodeManager(server);
       if (codeManager != null) {
         this.hiveCode = codeManager.getHiveCode(this.getUuid());
         if (this.hiveCode != null) {
@@ -325,13 +328,15 @@ public class DroneEntity extends PathAwareEntity {
     if (!this.getWorld().isClient) {
       MinecraftServer server = this.getWorld().getServer();
       if (server != null) {
-        HiveMindLinkManager linkManager = HiveMindLinkManager.getInstance(server);
+        HiveMindLinkManager linkManager =
+            HiveMindServiceManager.get().getLinkManager(server);
         if (linkManager != null) {
           linkManager.unlinkDrone(this.getUuid());
         }
 
         // NEW: Remove HiveCode
-        HiveCodeManager codeManager = HiveCodeManager.getInstance(server);
+        HiveCodeManager codeManager =
+            HiveMindServiceManager.get().getHiveCodeManager(server);
         if (codeManager != null) {
           codeManager.removeHiveCode(this.getUuid());
         }
