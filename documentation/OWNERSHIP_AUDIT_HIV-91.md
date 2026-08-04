@@ -179,43 +179,61 @@ This is the **actual gating mechanism** for player access but does NOT track dro
 
 ---
 
-## Architectural Findings
+## Architectural Findings (Per ADR-0007)
 
-### Canonical Authority for Drone Ownership
-**HiveMindLinkManager** is the de facto authority:
-- Actively queried by `DroneEntity` for ownership checks
-- Persists across restarts (world NBT)
-- Routed through `HiveMindServiceManager` for testability
-- Integrated with `DroneLinkUtils` service layer
+### Canonical Authority for Drone Ownership ✓ DECIDED
+**HiveMindLinkManager is the canonical authority (ADR-0007: Accepted)**
 
-### Architectural Debt: Unreconciled Collective Model
-**Hive/HiveManager** exists but is architecturally orphaned:
-- ✗ No integration with core drone-owner link
-- ✗ No resource flow when nodes are claimed
-- ✗ No player behavior consequences for research unlocks
-- ✓ Commands exist and work but isolated from main gameplay
+- ✓ Actively queried by `DroneEntity` for ownership checks
+- ✓ Persists across restarts (world NBT via `PersistentState`)
+- ✓ Routed through `HiveMindServiceManager` for testability
+- ✓ Integrated with `DroneLinkUtils` service layer
+- ✓ Already the de facto authority in practice
 
-### Access Control System Bifurcation
-**PlayerHiveComponent** gates initial access but does NOT track ownership:
-- Independent file-based persistence (not world NBT)
-- Used only for access item mechanics
-- Does not affect drone claiming or research
-- Could be unified with HiveMindLinkManager but currently separate
+**Decision rationale:**
+- Only system actively used in gameplay for drone ownership decisions
+- Supports Tier 1 MVP mental power gating logic
+- Service-managed abstraction enables future backend swaps
 
-### Synchronization Issues (Not Currently Observed)
-- HiveManager and LinkManager both persist to world NBT, independently
-- If a player's Hive is deleted but their drone links remain, systems diverge
-- No periodic reconciliation or validation
+### Hive/HiveManager: Deferred Integration (Not Canonical)
+**Hive/HiveManager serves distinct collective mechanics (not ownership):**
+- ✓ Guild-like collective model (future Tier 2+)
+- ✓ Shared resources and research tracking
+- ✗ NOT integrated with drone-owner relationships (intentional, per ADR)
+- ✗ NOT canonical for ownership queries
+
+**This is acceptable architectural debt because:**
+- Each system has a distinct concern
+- No active conflict (LinkManager handles drone ownership, Hive handles collectives)
+- Merger deferred to Tier 2+ when collective features expand
+
+### Access Control System (PlayerHiveComponent)
+**PlayerHiveComponent gates initial access but delegates ownership queries:**
+- ✓ File-based per-player persistence (HiveMindAccessItem gating)
+- ✓ Lifecycle management (player join/leave)
+- ✗ Does NOT attempt to track drone ownership (correctly delegates to LinkManager)
+- ✗ Synchronizes with LinkManager via `HiveMindLinkUtils` when player joins
+
+**This separation is correct per ADR-0007:**
+- Access control (PlayerHiveComponent) is separate from ownership (LinkManager)
+- No duplication or conflict
+- Clear separation of concerns
+
+### No Synchronization Issues (By Design)
+- HiveManager persists guild data (owned by HiveManager)
+- LinkManager persists drone ownership (owned by LinkManager)
+- PlayerHiveComponent persists access flags (owned by PlayerHiveComponent)
+- **Each system owns one data domain; no overlap = no conflict**
 
 ---
 
-## Recommendations (Future Refactoring)
+## Recommendations (Per ADR-0007)
 
-1. **Declare LinkManager canonical** for drone-owner relationships in documentation
-2. **Migrate Hive collective mechanics** to use LinkManager as base (if keeping)
-3. **Consider consolidating** PlayerHiveComponent access state into LinkManager
-4. **Add reconciliation task** to detect and handle orphaned state (e.g., drone with no owner, owner with no drone link)
-5. **Document in DESIGN_DECISIONS.md** which system owns each gameplay decision
+1. ✓ **Declare LinkManager canonical** — DONE by ADR-0007
+2. ✓ **Route all ownership queries through HiveMindServiceManager** — Already implemented (HIV-92)
+3. ✓ **Keep systems separate** — Intentional per ADR, not architectural debt
+4. ⏳ **Future: Integrate Hive/HiveManager into collective features (Tier 2+)** — Deferred
+5. ✓ **Document ownership hierarchy in QUICK_START.md** — Recommended
 
 ---
 
