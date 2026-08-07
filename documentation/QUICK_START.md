@@ -71,10 +71,16 @@ Commands / Usage:
 
 ```bash
 # Toggle Debug Mode
-/debug toggle
+/hive debug toggle
 
 # Dump Hive state
-/debug dump
+/hive debug dump
+
+# Unlock research nodes for testing
+/hive research unlock <nodeId>
+
+# Claim resource nodes
+/hive node claim <nodeId>
 
 # Use Debug Mode to view: hovered entity id, role, owner, hive id, and basic performance counters
 ```

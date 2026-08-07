@@ -11,17 +11,15 @@ import net.minecraft.nbt.NbtList;
 
 /**
  * Represents a player collective (guild-like group of players).
- * 
- * NOTE: This is NOT used for drone ownership decisions. See HiveMindLinkManager for
- * the canonical ownership system (ADR-0007).
- * 
- * Hive is used for collective mechanics:
- * - Member management (guild members)
- * - Shared resources (collective pool)
- * - Research tracking (collective skill tree)
- * 
- * Persisted to world NBT via HiveManager.
- * See ADR-0007 for detailed ownership architecture explanation.
+ *
+ * <p>NOTE: This is NOT used for drone ownership decisions. See HiveMindLinkManager for the
+ * canonical ownership system (ADR-0007).
+ *
+ * <p>Hive is used for collective mechanics: - Member management (guild members) - Shared resources
+ * (collective pool) - Research tracking (collective skill tree)
+ *
+ * <p>Persisted to world NBT via HiveManager. See ADR-0007 for detailed ownership architecture
+ * explanation.
  */
 public class Hive {
 

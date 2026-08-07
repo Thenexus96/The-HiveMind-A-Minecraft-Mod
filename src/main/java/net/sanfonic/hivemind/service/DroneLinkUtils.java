@@ -78,8 +78,6 @@ public final class DroneLinkUtils {
     return null;
   }
 
-  
-
   public static UUID getDroneOwnerWithService(HiveMindService service, UUID droneUuid) {
     if (service == null) return null;
     HiveMindLinkManager linkManager = service.getLinkManager(null);

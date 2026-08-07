@@ -14,22 +14,17 @@ import net.sanfonic.hivemind.Hivemind;
 
 /**
  * Server-side singleton managing player collectives (guilds).
- * 
- * NOTE: This is NOT the canonical ownership system for drone-owner relationships.
- * See HiveMindLinkManager for canonical ownership. See ADR-0007 for detailed
- * architecture.
- * 
- * HiveManager manages:
- * - Collective instances (per-player collectives + joined collectives)
- * - Member lists and permissions
- * - Shared resource pools
- * - Collective research progression
- * 
- * Persists hive data to world NBT.
- * Access via HiveManager.getInstance(server).
- * 
- * See ADR-0007: "Ownership System Architecture" for why Hive and HiveMindLinkManager
- * remain separate (distinct concerns, no consolidation needed).
+ *
+ * <p>NOTE: This is NOT the canonical ownership system for drone-owner relationships. See
+ * HiveMindLinkManager for canonical ownership. See ADR-0007 for detailed architecture.
+ *
+ * <p>HiveManager manages: - Collective instances (per-player collectives + joined collectives) -
+ * Member lists and permissions - Shared resource pools - Collective research progression
+ *
+ * <p>Persists hive data to world NBT. Access via HiveManager.getInstance(server).
+ *
+ * <p>See ADR-0007: "Ownership System Architecture" for why Hive and HiveMindLinkManager remain
+ * separate (distinct concerns, no consolidation needed).
  */
 public class HiveManager extends PersistentState {
 

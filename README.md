@@ -73,6 +73,19 @@ See our [Development Roadmap](documentation/roadmap/progress-tracking.md) for cu
 - [x] Basic AI behaviors
 - [ ] Debug tools (in progress)
 
+### Latest: Sprint 1 Complete ✅
+
+**Sprint 1 (August 2026)** is now complete! Core HiveMind features are implemented and tested:
+
+- 🐛 **Debug Mode** — Real-time state inspection and file dumps
+- 🏘️ **Hive System** — Player collectives with persistent resources
+- 🔬 **Research Progression** — Unlock colony upgrades
+- 🎯 **Node Claiming** — Gather resources to grow your colony
+
+All features persist across server restarts. See [QUICK_START.md](documentation/QUICK_START.md) for how to use them.
+
+**Next:** Mental Power system and manual drone control (Tier 1 MVP, coming soon).
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
