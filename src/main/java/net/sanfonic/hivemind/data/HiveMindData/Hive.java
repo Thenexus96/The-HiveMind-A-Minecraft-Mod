@@ -46,6 +46,8 @@ public class Hive {
     return ownerUuid;
   }
 
+  private int mentalPower;
+
   public Set<UUID> getMembers() {
     return new HashSet<>(members);
   }
@@ -103,6 +105,7 @@ public class Hive {
     NbtCompound nbt = new NbtCompound();
     nbt.putUuid("id", id);
     nbt.putUuid("ownerUuid", ownerUuid);
+    nbt.putInt("mentalPower", mentalPower);
 
     // Serialize members
     NbtList membersList = new NbtList();
@@ -157,13 +160,31 @@ public class Hive {
       hive.researchState.copyFrom(nbt.getCompound("researchState"));
     }
 
+    if (nbt.contains("mentalPower")) {
+      hive.setMentalPower(nbt.getInt("mentalPower"));
+    }
+
     return hive;
   }
 
   @Override
   public String toString() {
     return String.format(
-        "Hive{id=%s, owner=%s, members=%d, resources=%d}",
-        id, ownerUuid, members.size(), resources.size());
+        "Hive{id=%s, owner=%s, members=%d, resources=%d, mentalPower=%d}",
+        id, ownerUuid, members.size(), resources.size(), mentalPower);
+  }
+
+  public int getMentalPower() {
+    return mentalPower;
+  }
+
+  public void setMentalPower(int mentalPower) {
+    if (mentalPower > 10) {
+      this.mentalPower = 10;
+    } else if (mentalPower < 0) {
+      this.mentalPower = 0;
+    } else {
+      this.mentalPower = mentalPower;
+    }
   }
 }

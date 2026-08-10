@@ -88,6 +88,23 @@ Commands / Usage:
 Enable Debug Mode while running an internal test world to visualize node links, entity info, and simple performance metrics (tick time, entity counts).
 
 
+## Mental Power (Data Model)
+
+Mental power is the player's connection strength to the HiveMind, stored per-hive
+(0–10, clamped). It gates how many drones a player can control (1 power = 1 drone).
+
+**Current status**: data model and persistence only (HIV-116). There is no
+player-facing command yet — mental power must currently be set via
+`hive.setMentalPower(int)` in code (e.g. from a debug command or test) until
+the gain-mechanics ticket (HIV-117+) adds real gameplay hooks.
+
+- `Hive.getMentalPower()` / `Hive.setMentalPower(int)` — clamped to 0–10
+- Persists automatically with the rest of `Hive` data via `HiveManager`'s NBT save/load
+- Config (`config/hivemind.json`):
+  - `mentalPowerMax` (int, default `10`)
+  - `mentalPowerGainRate` (double, default `0.5`)
+  - `mentalPowerGainMechanism` (String, default `"passive"`)
+
 ## Important Paths
 
 | Path | Purpose |

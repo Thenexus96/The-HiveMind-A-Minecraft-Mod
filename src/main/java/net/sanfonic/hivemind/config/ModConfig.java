@@ -22,6 +22,8 @@ public class ModConfig {
   public double droneFollowRange = 16.0;
   public double droneHealth = 40.0;
   public double droneSpeed = 0.25;
+  public int mentalPowerMax = 10;
+  public double mentalPowerGainRate = 0.5;
 
   // NEW: Debug Mode Options
   public boolean debugModeEnabled = false;
@@ -61,6 +63,9 @@ public class ModConfig {
             this.droneFollowRange = loaded.droneFollowRange;
             this.droneHealth = loaded.droneHealth;
             this.droneSpeed = loaded.droneSpeed;
+            this.mentalPowerMax = loaded.mentalPowerMax;
+            this.mentalPowerGainRate = loaded.mentalPowerGainRate;
+            this.mentalPowerGainMechanism = loaded.mentalPowerGainMechanism;
 
             // NEW: Load debug settings
             this.debugModeEnabled = loaded.debugModeEnabled;
@@ -162,4 +167,7 @@ public class ModConfig {
   public boolean shouldAutoLink() {
     return debugModeEnabled && debugAutoLink;
   }
+
+  // Mental power
+  public String mentalPowerGainMechanism = "passive";
 }

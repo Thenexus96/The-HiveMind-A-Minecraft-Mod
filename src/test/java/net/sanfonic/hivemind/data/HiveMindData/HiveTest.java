@@ -99,4 +99,35 @@ class HiveTest {
     assertEquals(100, loadedHive.getResourceValue("wood"), "Wood resources should match");
     assertEquals(50, loadedHive.getResourceValue("stone"), "Stone resources should match");
   }
+
+  @Test
+  @DisplayName("Mental power persists through NBT serialization")
+  void testMentalPowerPersistence() {
+    hive.setMentalPower(5);
+
+    NbtCompound nbt = hive.toNbt();
+    Hive loadedHive = Hive.fromNbt(nbt);
+
+    assertEquals(5, loadedHive.getMentalPower(), "Mental power should survive NBT round-trip");
+  }
+
+  @Test
+  @DisplayName("Testing the Mental Power Clamp for Maximum Value")
+  void testMentalPowerClampsToMaxAfterPersistence() {
+    hive.setMentalPower(50);
+    NbtCompound nbt = hive.toNbt();
+    Hive loadedHive = Hive.fromNbt(nbt);
+
+    assertEquals(10, loadedHive.getMentalPower(), "Mental power should be clamped to maximum value");
+  }
+
+  @Test
+  @DisplayName("Testing the Mental Power Clamp for Minimum Value")
+  void testMentalPowerClampsToMinAfterPersistence() {
+    hive.setMentalPower(-10);
+    NbtCompound nbt = hive.toNbt();
+    Hive loadedHive = Hive.fromNbt(nbt);
+
+    assertEquals(0, loadedHive.getMentalPower(), "Mental power should be clamped to minimum value");
+  }
 }

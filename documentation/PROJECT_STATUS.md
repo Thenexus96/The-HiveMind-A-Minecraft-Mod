@@ -4,7 +4,7 @@
 document in this repo disagrees with this one, this one wins — update the other
 document or archive it.
 
-**Last updated:** 2026-07-10
+**Last updated:** 2026-08-09
 **Maintained by:** Nick, with Claude as ongoing dev/documentation partner.
 
 ---
@@ -64,6 +64,47 @@ The mod has three ownership systems, each with distinct responsibility (no conso
 - Add integration tests for mental power gating (Tier 1 MVP use case)
 - Document Hive/HiveManager javadoc to clarify they're not orphaned, just isolated
 
+
+## 2a. Tier 1 MVP: Mental power (HIV-115 epic)
+
+**Status Update (2026-08-09):** HIV-116 (Mental Power Data Model & Persistence) is done.
+
+### What's implemented
+
+- `Hive.mentalPower` (int, 0–10, clamped in `setMentalPower()`) — lives on
+  `Hive`, not a separate class or on `HiveCore`. This follows the same
+  "collective mechanics live on `Hive`/`HiveManager`" boundary that ADR-0007
+  already established for resources and research state.
+- NBT persistence via `Hive.toNbt()` / `Hive.fromNbt()`, following the exact
+  pattern used for `resources`. Load path routes through `setMentalPower()`
+  (not direct field assignment), so an out-of-range or corrupted saved value
+  gets re-clamped on load rather than trusted as-is.
+- `ModConfig` additions: `mentalPowerMax` (int, default `10`),
+  `mentalPowerGainRate` (double, default `0.5`),
+  `mentalPowerGainMechanism` (String, default `"passive"`) — public fields,
+  matching the existing `ModConfig` pattern (see Batch 6 below; not fixed as
+  part of this ticket, scope was kept to HIV-116).
+- Unit tests in `HiveTest.java`: normal persistence, max-clamp persistence,
+  min-clamp persistence — all passing. Verified via `spotlessApply`,
+  `compileJava`, `test` (full `build` not run due to pre-existing SpotBugs
+  warnings unrelated to this change — see note below).
+- Doc note added to `QUICK_START.md`.
+
+### Note on SpotBugs
+
+`ModConfig`'s new fields trip `PA_PUBLIC_PRIMITIVE_ATTRIBUTE`, same as ~15
+pre-existing fields in that file already do. This is expected and already
+tracked as Batch 6 below — not a regression introduced by HIV-116.
+
+### Outstanding / explicitly deferred
+
+- No player-facing command to view/set mental power yet.
+- No gain mechanics (passive drip, combat, research, etc.) — deferred to
+  HIV-117+ per `CORE_PRINCIPLES.md` #7 (complexity must earn its keep) and
+  #11 (stable foundations first).
+- `mentalPowerGainMechanism` is a single `String` placeholder by design, not
+  a list/registry — see chat discussion; multi-source gain is a future
+  ticket's problem, not this one's.
 ---
 
 ## 3. Other active architectural items
